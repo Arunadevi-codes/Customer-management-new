@@ -86,7 +86,7 @@ const CustomersSearch = ({
   {/* TOTAL */}
   <div className="px-2 py-2">
     <p className="text-xs text-gray-400">
-      Total customers = {total}
+      Total customers {total}
     </p>
   </div>
 
