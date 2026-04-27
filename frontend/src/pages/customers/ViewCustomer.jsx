@@ -1,7 +1,8 @@
 import React from 'react';
-import { Edit, Trash2, Mail, Phone, MapPin, Users } from 'lucide-react';
+import { Edit, Trash2, Users, Eye } from 'lucide-react';
+import statesData from "../../data/statesData";
 
-const ViewCustomers = ({ customers = [], onEdit, onDelete, total = 0 }) => {
+const ViewCustomers = ({ customers = [], onEdit, onDelete, onView }) => {
   const safeCustomers = customers || [];
 
   if (safeCustomers.length === 0) {
@@ -18,109 +19,110 @@ const ViewCustomers = ({ customers = [], onEdit, onDelete, total = 0 }) => {
     );
   }
 
+  const getStateName = (stateId) => {
+  return statesData[stateId]?.name || "—";
+};
+
+const getCityName = (stateId, cityId) => {
+  const state = statesData[stateId];
+  if (!state) return "—";
+
+  const city = state.cities.find(
+    (c) => String(c.id) === String(cityId)
+  );
+
+  return city ? city.name : "—";
+};
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="overflow-x-auto -mx-4 md:mx-0 -mt-2">
-        <div className="min-w-full inline-block align-middle">
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
-                  </th>
-                  <th className="hidden sm:table-cell px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Address
-                  </th>
-                  <th className="hidden lg:table-cell px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created Date
-                  </th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {safeCustomers.map((customer) => (
-                  <tr key={customer._id} className="hover:bg-gray-50 transition-colors duration-200">
-                    {/* ✅ Customer Name - Removed avatar logo */}
-                    <td className="px-4 md:px-4 py-2">
-                      <div className="flex items-center space-x-3">
-                        {/* Avatar */}
-                        <div className="w-9 h-9 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
-                          {customer.name?.charAt(0).toUpperCase() || 'C'}
-                        </div>
-                        <p className="font-medium text-gray-800 text-sm md:text-base">{customer.name}</p>
-                      </div>
-                    </td>
-                    
-                    <td className="px-4 md:px-4 py-2">
-                      <div className="flex items-center space-x-2">
-                        <Mail size={14} className="text-gray-400 hidden sm:inline" />
-                        <span className="text-sm text-gray-600 break-all">{customer.email}</span>
-                      </div>
-                    </td>
-                    
-                    <td className="px-4 md:px-4 py-2">
-                      <div className="flex items-center space-x-2">
-                        <Phone size={14} className="text-gray-400 hidden sm:inline" />
-                        <span className="text-sm text-gray-600">{customer.phone}</span>
-                      </div>
-                    </td>
-                    
-                    <td className="hidden sm:table-cell px-4 md:px-4 py-2">
-                      <div className="flex items-center space-x-2">
-                        <MapPin size={14} className="text-gray-400" />
-                        <span className="text-sm text-gray-600 break-words">
-                          {customer.address || '—'}
-                        </span>
-                      </div>
-                    </td>
-                    
-                    <td className="hidden lg:table-cell px-4 md:px-4 py-2">
-                      <span className="text-sm text-gray-600 whitespace-nowrap">
-                        {customer.createdAt 
-                          ? new Date(customer.createdAt).toLocaleDateString('en-IN', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric'
-                            })
-                          : '—'}
-                      </span>
-                    </td>
-                    
-                    <td className="px-4 md:px-4 py-2">
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => onEdit(customer)}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Edit Customer"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button
-                          onClick={() => onDelete(customer._id)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete Customer"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
 
+          {/* HEADER */}
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+              <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
+              <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+
+          {/* BODY */}
+          <tbody className="divide-y divide-gray-200">
+            {safeCustomers.map((customer) => {
+            
+  return (
+    <tr key={customer._id} className="hover:bg-gray-50">
+
+      {/* NAME */}
+      <td className="px-4 py-2">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full overflow-hidden border">
+            {customer.image ? (
+              <img
+                src={`http://localhost:5000/uploads/${customer.image}`}
+                alt={customer.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="bg-indigo-500 text-white w-full h-full flex items-center justify-center text-sm">
+                {customer.name?.charAt(0)?.toUpperCase() || 'C'}
+              </span>
+            )}
+          </div>
+          <p className="text-sm font-medium">{customer.name}</p>
+        </div>
+      </td>
+
+      {/* EMAIL */}
+      <td className="px-4 py-2 text-sm text-gray-600">
+        {customer.email || '—'}
+      </td>
+
+      {/* PHONE */}
+      <td className="px-4 py-2 text-sm text-gray-600">
+        {customer.phone || '—'}
+      </td>
+
+      <td className="hidden sm:table-cell px-4 py-2 text-sm text-gray-600">
+  {customer.street || '—'}, 
+{getCityName(customer.state, customer.city)}, 
+{getStateName(customer.state)} 
+- {customer.pincode || '—'}
+</td>
+
+      {/* DATE */}
+      <td className="hidden lg:table-cell px-4 py-2 text-sm text-gray-600">
+        {customer.createdAt
+          ? new Date(customer.createdAt).toLocaleDateString('en-IN')
+          : '—'}
+      </td>
+
+      {/* ACTIONS */}
+      <td className="px-4 py-2">
+        <div className="flex gap-2">
+          <button onClick={() => onView(customer._id)} className="p-1 text-green-600 hover:bg-green-50 rounded">
+            <Eye size={18} />
+          </button>
+          <button onClick={() => onEdit(customer)} className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+            <Edit size={18} />
+          </button>
+          <button onClick={() => onDelete(customer._id)} className="p-1 text-red-600 hover:bg-red-50 rounded">
+            <Trash2 size={18} />
+          </button>
+        </div>
+      </td>
+
+    </tr>
+  );
+})}
+          </tbody>
+        </table>
+      </div>
       <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
         <p className="text-sm text-gray-500">
           Showing {safeCustomers.length} customer{safeCustomers.length !== 1 ? 's' : ''}

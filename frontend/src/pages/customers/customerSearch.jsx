@@ -29,7 +29,7 @@ const CustomersSearch = ({
         placeholder="Search customers..."
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="w-full border pl-10 pr-10 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+        className="w-full border pl-10 pr-10 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
       />
 
       {searchTerm && (

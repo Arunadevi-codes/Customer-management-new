@@ -4,13 +4,19 @@ import CustomersHeader from './customerHeader';
 import CustomersSearch from './customerSearch';
 import CustomersLoading from './customerLoading';
 import CustomersPagination from './customerPagination';
-import ViewCustomers from './viewCustomer';
-import AddEditCustomers from './addeditCustomer';
+import ViewCustomer from './viewCustomer';
+import ViewCustomers from './customerPOPup';
+import AddCustomer from './addCustomer';
+import EditCustomer from './editCustomer';
 import DeleteCustomer from './deleteCustomer';
+import statesData from '../../data/statesData';
 
 const Customers = () => {
   const {
     customers,
+    states,
+    cities,
+    pincode,
     loading,
     searchTerm,
     setSearchTerm,
@@ -30,10 +36,14 @@ const Customers = () => {
     handleDeleteClick,
     handleSaveCustomer,
     handleConfirmDelete,
+    handleView,
     fromDate,
     setFromDate,
     toDate,
     setToDate,
+    selectedCustomer,
+  showView,
+    setShowView
   } = useCustomers();
 
   return (
@@ -54,11 +64,16 @@ const Customers = () => {
     <CustomersLoading />
   ) : (
     <>
-      <ViewCustomers
+    
+      <ViewCustomer
         customers={customers}
+        states={states}
+        cities={cities}
+        pincode={pincode}
         onEdit={handleEditClick}
         onDelete={handleDeleteClick}
         total={total}
+        onView={handleView}
       />
       {total > 0 && (
         <CustomersPagination
@@ -75,18 +90,34 @@ const Customers = () => {
     </>
   )}
   {isModalOpen && (
-    <AddEditCustomers
+  editingCustomer ? (
+    <EditCustomer
       customer={editingCustomer}
       onSave={handleSaveCustomer}
       onClose={() => setIsModalOpen(false)}
     />
-  )}
+  ) : (
+    <AddCustomer
+      onSave={handleSaveCustomer}
+      onClose={() => setIsModalOpen(false)}
+    />
+  )
+)}
   {isDeleteModalOpen && (
     <DeleteCustomer
       onConfirm={handleConfirmDelete}
       onClose={() => setIsDeleteModalOpen(false)}
     />
   )}
+
+  {showView && (
+  <ViewCustomers
+    customer={selectedCustomer}
+    onClose={() => setShowView(false)}
+    states={Object.values(statesData)}
+    // cities={[]}
+  />
+)}
 </div>
 
   );

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback} from 'react';
 import { toast } from 'react-toastify';
 import API from "../../services/api";
 
@@ -16,6 +16,8 @@ export const useCustomers = () => {
   const [total, setTotal] = useState(0);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [showView, setShowView] = useState(false);
 
   const totalPages = Math.ceil(total / limit) || 1;
 
@@ -46,7 +48,7 @@ export const useCustomers = () => {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
-      const offset = (page - 1) * limit;
+      const offset = page - 1
 
       const params = new URLSearchParams();
       params.append("offset", offset);
@@ -93,6 +95,19 @@ export const useCustomers = () => {
     setIsDeleteModalOpen(true);
   };
 
+  const handleView = async (id) => {
+  
+  try {
+    const res = await API.get(`/customers/${id}`);
+    console.log("DATA:", res.data); 
+    setSelectedCustomer(res.data);
+    setShowView(true);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to load customer details");
+  }
+};
+
   const handleSaveCustomer = async (formData) => {
     try {
       if (editingCustomer) {
@@ -100,7 +115,7 @@ export const useCustomers = () => {
         toast.success("Customer updated successfully!");
       } else {
         await API.post("/customers", formData);
-        toast.success("Customer added successfully!");
+
       }
       fetchCustomers();
       setIsModalOpen(false);
@@ -122,30 +137,14 @@ export const useCustomers = () => {
     }
   };
 
+  
+
   return {
-    customers,
-    loading,
-    searchTerm,
-    setSearchTerm,
-    isModalOpen,
-    setIsModalOpen,
-    isDeleteModalOpen,
-    setIsDeleteModalOpen,
-    editingCustomer,
-    page,
-    setPage,
-    limit,
-    setLimit,
-    total,
-    totalPages,
-    handleAddClick,
-    handleEditClick,
-    handleDeleteClick,
-    handleSaveCustomer,
-    handleConfirmDelete,
-    fromDate,
-    setFromDate,
-    toDate,
-    setToDate,
+    customers, loading, searchTerm, setSearchTerm, isModalOpen,
+    setIsModalOpen, isDeleteModalOpen, setIsDeleteModalOpen, editingCustomer,
+    page, setPage, limit, setLimit, total, totalPages, handleAddClick,
+    handleEditClick, handleDeleteClick, handleSaveCustomer, handleConfirmDelete,
+    fromDate, setFromDate, toDate, setToDate, handleView, selectedCustomer,
+    showView, setShowView
   };
 };
