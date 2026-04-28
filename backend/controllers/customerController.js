@@ -62,9 +62,12 @@ exports.getCustomers = async (req, res) => {
     }
 
     const skip = offset * limit;
+    const sortField = req.query.sortField || "createdAt";
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
 
     const customers = await Customer.find(query)
-      .sort({ _id: -1 })
+      .sort({ [sortField]: sortOrder })
+      .collation({ locale: "en", strength: 2 })
       .skip(skip)
       .limit(limit);
 

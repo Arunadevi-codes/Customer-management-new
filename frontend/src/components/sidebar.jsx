@@ -112,9 +112,9 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
 
       {/* Sidebar - Mobile (Slide-in) */}
       <div
-        className={`md:hidden fixed top-0 left-0 h-full bg-white border-r border-gray-200 border-t border-gray-200 z-50 transition-transform duration-300 ${
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
-        } w-64`}
+      className={`md:hidden fixed top-0 left-0 h-full bg-white border-r border-gray-200 border-t border-gray-200 z-50 transition-transform duration-300 ${
+        mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        } w-[75%] max-w-[240px]`}
       >
         <SidebarContent />
       </div>

@@ -1,6 +1,9 @@
 import React from "react";
 import { X, User, Mail, Phone, MapPin, Calendar } from "lucide-react";
 import statesData from "../../data/statesData";
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/500.css";
+import "@fontsource/poppins/600.css";
 
 const ViewCustomer = ({ customer, onClose }) => {
   if (!customer) return null;
@@ -28,17 +31,26 @@ const getCityName = (stateId, cityId) => {
       })
     : "—";
 
+    const imageUrl = customer.image
+  ? `http://localhost:5000/uploads/${customer.image}`
+  : null;
+
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50 p-2 sm:p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-end sm:items-center z-50 p-2 sm:p-4 font-[Poppins]"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-auto max-h-[90vh] sm:max-h-[85vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+  className="bg-white rounded-2xl shadow-2xl 
+  w-[95%] sm:w-full 
+  max-w-sm sm:max-w-md md:max-w-lg 
+  mx-auto 
+  max-h-[85vh] 
+  overflow-y-auto"
+  onClick={(e) => e.stopPropagation()}
+>
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-4 sm:p-6 text-white sticky top-0 z-10">
+        <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-3 sm:p-5 md:p-6 text-white sticky top-0 z-10">
           <button
             onClick={onClose}
             className="absolute top-3 right-3 sm:top-4 sm:right-4 hover:bg-white hover:bg-opacity-20 rounded-full p-1.5"
@@ -47,14 +59,22 @@ const getCityName = (stateId, cityId) => {
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3">
-              <User size={22} />
-            </div>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-white/20 flex items-center justify-center">
+  {imageUrl ? (
+    <img
+      src={imageUrl}
+      alt="profile"
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <User size={22} />
+  )}
+</div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
                 Customer Details
               </h2>
-              <p className="text-indigo-100 text-xs sm:text-sm">
+              <p className="text-[10px] sm:text-xs md:text-sm text-indigo-100">
                 View complete information
               </p>
             </div>
@@ -62,7 +82,7 @@ const getCityName = (stateId, cityId) => {
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-6 space-y-4">
+        <div className="p-3 sm:p-5 md:p-6 space-y-3 sm:space-y-4">
 
           <Detail icon={<User size={18} />} label="Full Name" value={customer.name} />
           <Detail icon={<Mail size={18} />} label="Email Address" value={customer.email} />
@@ -73,7 +93,7 @@ const getCityName = (stateId, cityId) => {
           {/* ✅ FIXED LOCATION */}
           <Detail
             icon={<MapPin size={18} />}
-            label="Location"
+            label="State and City"
             value={
               cityName !== "—" && stateName !== "—"
                 ? `${cityName}, ${stateName}`
@@ -88,24 +108,13 @@ const getCityName = (stateId, cityId) => {
           <Detail icon={<MapPin size={18} />} label="PIN Code" value={customer.pincode} />
 
         </div>
-
-        {/* Footer */}
-        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg flex items-center gap-2"
-          >
-            <X size={16} />
-            Close
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
 const Detail = ({ icon, label, value }) => (
-  <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
+  <div className="flex items-start gap-2 sm:gap-3 pb-2 sm:pb-3 border-b border-gray-100">
     <div className="text-indigo-500 mt-0.5">{icon}</div>
     <div className="flex-1">
       <p className="text-xs text-gray-500 uppercase">{label}</p>

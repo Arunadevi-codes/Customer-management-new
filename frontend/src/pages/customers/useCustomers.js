@@ -18,6 +18,8 @@ export const useCustomers = () => {
   const [toDate, setToDate] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showView, setShowView] = useState(false);
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");  
 
   const totalPages = Math.ceil(total / limit) || 1;
 
@@ -53,6 +55,8 @@ export const useCustomers = () => {
       const params = new URLSearchParams();
       params.append("offset", offset);
       params.append("limit", limit);
+      params.append("sortField", sortField);
+      params.append("sortOrder", sortOrder);
 
       // 📅 If date filter → ignore search
       if (fromDate || toDate) {
@@ -74,7 +78,7 @@ export const useCustomers = () => {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, debouncedSearch, fromDate, toDate]);
+  }, [page, limit, debouncedSearch, fromDate, toDate, sortField, sortOrder]);
 
   useEffect(() => {
     fetchCustomers();
@@ -95,6 +99,16 @@ export const useCustomers = () => {
     setIsDeleteModalOpen(true);
   };
 
+  const handleSort = (field) => {
+  if (sortField === field) {
+    // toggle asc <-> desc
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  } else {
+    setSortField(field);
+    setSortOrder("asc");
+  }
+};
+
   const handleView = async (id) => {
   
   try {
@@ -112,7 +126,6 @@ export const useCustomers = () => {
     try {
       if (editingCustomer) {
         await API.put(`/customers/${editingCustomer._id}`, formData);
-        toast.success("Customer updated successfully!");
       } else {
         await API.post("/customers", formData);
 
@@ -145,6 +158,6 @@ export const useCustomers = () => {
     page, setPage, limit, setLimit, total, totalPages, handleAddClick,
     handleEditClick, handleDeleteClick, handleSaveCustomer, handleConfirmDelete,
     fromDate, setFromDate, toDate, setToDate, handleView, selectedCustomer,
-    showView, setShowView
+    showView, setShowView, sortField, sortOrder, handleSort
   };
 };

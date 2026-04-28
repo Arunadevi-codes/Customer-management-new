@@ -4,10 +4,9 @@ import CustomersHeader from './customerHeader';
 import CustomersSearch from './customerSearch';
 import CustomersLoading from './customerLoading';
 import CustomersPagination from './customerPagination';
-import ViewCustomer from './viewCustomer';
+import ViewCustomer from './viewCustomer/viewCustomer';
 import ViewCustomers from './customerPOPup';
-import AddCustomer from './addCustomer';
-import EditCustomer from './editCustomer';
+import CustomerForm from './addeditCustomer/customerForm';
 import DeleteCustomer from './deleteCustomer';
 import statesData from '../../data/statesData';
 
@@ -42,8 +41,11 @@ const Customers = () => {
     toDate,
     setToDate,
     selectedCustomer,
-  showView,
-    setShowView
+    showView,
+    setShowView,
+    handleSort,
+    sortField,
+    sortOrder
   } = useCustomers();
 
   return (
@@ -74,6 +76,9 @@ const Customers = () => {
         onDelete={handleDeleteClick}
         total={total}
         onView={handleView}
+        onSort={handleSort}
+        sortField={sortField}
+        sortOrder={sortOrder}
       />
       {total > 0 && (
         <CustomersPagination
@@ -90,18 +95,11 @@ const Customers = () => {
     </>
   )}
   {isModalOpen && (
-  editingCustomer ? (
-    <EditCustomer
-      customer={editingCustomer}
-      onSave={handleSaveCustomer}
-      onClose={() => setIsModalOpen(false)}
-    />
-  ) : (
-    <AddCustomer
-      onSave={handleSaveCustomer}
-      onClose={() => setIsModalOpen(false)}
-    />
-  )
+  <CustomerForm
+    customer={editingCustomer}   
+    onSave={handleSaveCustomer}
+    onClose={() => setIsModalOpen(false)}
+  />
 )}
   {isDeleteModalOpen && (
     <DeleteCustomer

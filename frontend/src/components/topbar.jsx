@@ -1,9 +1,11 @@
+// Topbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 const Topbar = ({ onMenuClick, collapsed, onMobileMenuToggle, isMobileMenuOpen }) => {
   const [userName, setUserName] = useState('');
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
     // Get user data from localStorage
@@ -13,15 +15,17 @@ const Topbar = ({ onMenuClick, collapsed, onMobileMenuToggle, isMobileMenuOpen }
       setUserName(user.name || user.username || 'User');
     }
 
-    // Check if screen is mobile
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    // Check screen size
+    const checkScreenSize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
     
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   // Get initials for avatar
@@ -35,8 +39,8 @@ const Topbar = ({ onMenuClick, collapsed, onMobileMenuToggle, isMobileMenuOpen }
   };
 
   const handleMenuClick = () => {
-    if (isMobile) {
-      // On mobile, toggle mobile menu
+    if (isMobile || isTablet) {
+      // On mobile/tablet, toggle mobile menu
       if (onMobileMenuToggle) {
         onMobileMenuToggle();
       }
@@ -55,9 +59,9 @@ const Topbar = ({ onMenuClick, collapsed, onMobileMenuToggle, isMobileMenuOpen }
         <button 
           onClick={handleMenuClick}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          aria-label={isMobile ? "Toggle mobile menu" : (collapsed ? "Expand sidebar" : "Collapse sidebar")}
+          aria-label={(isMobile || isTablet) ? "Toggle mobile menu" : (collapsed ? "Expand sidebar" : "Collapse sidebar")}
         >
-          {isMobile && isMobileMenuOpen ? (
+          {(isMobile || isTablet) && isMobileMenuOpen ? (
             <X size={20} className="text-gray-600" />
           ) : (
             <Menu size={20} className="text-gray-600" />
@@ -66,7 +70,7 @@ const Topbar = ({ onMenuClick, collapsed, onMobileMenuToggle, isMobileMenuOpen }
 
         {/* Mobile/Desktop Title */}
         <div className="flex items-center">
-          <h1 className="text-lg md:text-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-base sm:text-lg md:text-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
             Customer Manager
           </h1>
         </div>
@@ -74,7 +78,7 @@ const Topbar = ({ onMenuClick, collapsed, onMobileMenuToggle, isMobileMenuOpen }
 
       {/* Right side - User Profile */}
       <div className="flex items-center space-x-3 md:space-x-4">
-        {/* User Avatar with Dropdown (Optional) */}
+        {/* User Avatar with Dropdown */}
         <div className="relative group">
           <button 
             className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -83,12 +87,12 @@ const Topbar = ({ onMenuClick, collapsed, onMobileMenuToggle, isMobileMenuOpen }
             <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-md">
               {getInitials(userName) || 'U'}
             </div>
-            <span className="hidden md:inline text-sm font-medium text-gray-700">
+            <span className="hidden sm:inline text-sm font-medium text-gray-700">
               {userName || 'Guest'}
             </span>
           </button>
 
-          {/* Dropdown Menu (Optional) */}
+          {/* Dropdown Menu */}
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
             <div className="py-2">
               <div className="px-4 py-2 border-b border-gray-100">
