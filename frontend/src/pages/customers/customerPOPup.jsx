@@ -41,7 +41,7 @@ const getCityName = (stateId, cityId) => {
       onClick={onClose}
     >
       <div
-  className="bg-white rounded-2xl shadow-2xl 
+  className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl 
   w-[95%] sm:w-full 
   max-w-sm sm:max-w-md md:max-w-lg 
   mx-auto 
@@ -53,7 +53,7 @@ const getCityName = (stateId, cityId) => {
         <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-3 sm:p-5 md:p-6 text-white sticky top-0 z-10">
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 sm:top-4 sm:right-4 hover:bg-white hover:bg-opacity-20 rounded-full p-1.5"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 hover:bg-white hover:bg-opacity-20 dark:hover:bg-gray-700 rounded-full p-1.5"
           >
             <X size={18} />
           </button>
@@ -114,11 +114,11 @@ const getCityName = (stateId, cityId) => {
 };
 
 const Detail = ({ icon, label, value }) => (
-  <div className="flex items-start gap-2 sm:gap-3 pb-2 sm:pb-3 border-b border-gray-100">
+  <div className="flex items-start gap-2 sm:gap-3 pb-2 sm:pb-3 border-b border-gray-100 dark:border-gray-700">
     <div className="text-indigo-500 mt-0.5">{icon}</div>
     <div className="flex-1">
-      <p className="text-xs text-gray-500 uppercase">{label}</p>
-      <p className="text-gray-800 mt-0.5">{value || "—"}</p>
+      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">{label}</p>
+      <p className="text-gray-800 dark:text-white mt-0.5">{value || "—"}</p>
     </div>
   </div>
 );

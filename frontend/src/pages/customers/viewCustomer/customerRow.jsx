@@ -16,7 +16,7 @@ const getCityName = (stateId, cityId) => {
 };
 
 const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
-  <tr className="hover:bg-gray-50 transition-colors duration-200 border-b border-gray-100 divide-x divide-gray-100">
+  <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 border-b border-gray-100 dark:border-gray-700 divide-x divide-gray-100 dark:divide-gray-700">
 
     {/* NAME */}
     <td className="px-3 sm:px-4 py-2 sm:py-3">
@@ -36,7 +36,7 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
         </div>
 
         <div
-          className="truncate max-w-[120px] sm:max-w-[150px] text-xs sm:text-sm font-medium text-gray-800"
+          className="truncate max-w-[120px] sm:max-w-[150px] text-xs sm:text-sm font-medium text-gray-800 dark:text-white"
           title={customer.name}
         >
           {customer.name}
@@ -45,17 +45,16 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
     </td>
 
     {/* EMAIL */}
-<td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 relative group">
+<td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300 relative group">
 
   {/* Visible truncated text */}
-  <div className="truncate max-w-[140px]">
+  <div className="truncate max-w-[200px]">
     {customer.email || "—"}
   </div>
 
   {/* Tooltip */}
   {customer.email && (
-    <div className="absolute left-0 top-full mt-1 hidden group-hover:block z-50 bg-gray-500 text-white text-xs rounded-lg p-2 shadow-lg w-max max-w-[250px]">
-      <div className="font-medium">Email </div>
+    <div className="absolute left-0 top-full mt-1 hidden group-hover:block z-50 bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg p-2 shadow-lg w-max max-w-[250px]">
       <div className="break-all">
         {customer.email}
       </div>
@@ -64,17 +63,17 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
 </td>
 
     {/* PHONE */}
-    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
       <div className="truncate max-w-[120px]" title={customer.phone}>
         {customer.phone || "—"}
       </div>
     </td>
 
     {/* ADDRESS */}
-    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 relative group">
+    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300 relative group">
 
   {/* Visible truncated text */}
-  <div className="truncate max-w-[180px]">
+  <div className="truncate max-w-[350px]">
     {customer.street ? (
       <>
         {customer.street}, {getCityName(customer.state, customer.city)},{" "}
@@ -88,8 +87,7 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
 
   {/* Tooltip */}
   {customer.street && (
-    <div className="absolute left-0 top-full mt-1 hidden group-hover:block z-50 bg-gray-500 text-white text-xs rounded-lg p-2 shadow-lg w-max max-w-[250px]">
-      <div className="font-medium">Full Address</div>
+    <div className="absolute left-0 top-full mt-1 hidden group-hover:block z-50 bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg p-2 shadow-lg w-max max-w-[250px]">
       <div>
         {customer.street}, {getCityName(customer.state, customer.city)}
       </div>
@@ -101,7 +99,7 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
 </td>
 
     {/* CREATED */}
-    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+    <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
       <div className="truncate max-w-[120px]" title={customer.createdAt}>
         {customer.createdAt
           ? new Date(customer.createdAt).toLocaleDateString("en-IN")
@@ -114,7 +112,7 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
       <div className="flex gap-1.5 sm:gap-2">
         <button
           onClick={() => onView(customer._id)}
-          className="p-1.5 sm:p-1 text-green-600 hover:bg-green-50 rounded-lg transition"
+          className="p-1.5 sm:p-1 text-green-600 hover:bg-green-50 dark:hover:bg-gray-800 rounded-lg transition"
           title="View customer"
         >
           <Eye size={16} />
@@ -122,7 +120,7 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
 
         <button
           onClick={() => onEdit(customer)}
-          className="p-1.5 sm:p-1 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+          className="p-1.5 sm:p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition"
           title="Edit customer"
         >
           <Edit size={16} />
@@ -130,7 +128,7 @@ const CustomerRow = ({ customer, onEdit, onDelete, onView }) => (
 
         <button
           onClick={() => onDelete(customer._id)}
-          className="p-1.5 sm:p-1 text-red-600 hover:bg-red-50 rounded-lg transition"
+          className="p-1.5 sm:p-1 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 rounded-lg transition"
           title="Delete customer"
         >
           <Trash2 size={16} />

@@ -19,7 +19,8 @@ export const useCustomers = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showView, setShowView] = useState(false);
   const [sortField, setSortField] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("desc");  
+  const [sortOrder, setSortOrder] = useState("desc"); 
+  // const [originalCustomers] = useState(customers); 
 
   const totalPages = Math.ceil(total / limit) || 1;
 
@@ -55,8 +56,10 @@ export const useCustomers = () => {
       const params = new URLSearchParams();
       params.append("offset", offset);
       params.append("limit", limit);
-      params.append("sortField", sortField);
-      params.append("sortOrder", sortOrder);
+      if (sortField && sortOrder) {
+  params.append("sortField", sortField);
+  params.append("sortOrder", sortOrder);
+}
 
       // 📅 If date filter → ignore search
       if (fromDate || toDate) {
@@ -99,10 +102,16 @@ export const useCustomers = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleSort = (field) => {
+ const handleSort = (field) => {
   if (sortField === field) {
-    // toggle asc <-> desc
-    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    if (sortOrder === "asc") {
+      setSortOrder("desc");
+    } else if (sortOrder === "desc") {
+      setSortField(null);
+      setSortOrder(null);
+    } else {
+      setSortOrder("asc");
+    }
   } else {
     setSortField(field);
     setSortOrder("asc");

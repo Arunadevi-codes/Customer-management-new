@@ -162,7 +162,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col transition-colors duration-300">
 
         <CustomerFormHeader isEdit={isEdit} onClose={onClose} />
 

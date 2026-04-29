@@ -4,7 +4,7 @@ import { Upload, User } from 'lucide-react';
 const CustomerImageUpload = ({ preview, handleFileChange }) => (
   <div className="flex flex-col items-center justify-center pb-2">
     <div className="relative group">
-      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center overflow-hidden shadow-md ring-4 ring-white">
+      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center overflow-hidden shadow-md ring-4 ring-white dark:ring-gray-900">
         {preview ? (
           <img 
             src={preview} 
@@ -17,7 +17,7 @@ const CustomerImageUpload = ({ preview, handleFileChange }) => (
       </div>
       <label 
         htmlFor="profile-image" 
-        className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-md cursor-pointer hover:bg-gray-50 transition-colors border border-gray-200"
+        className="absolute bottom-0 right-0 p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
       >
         <Upload size={16} className="text-indigo-600" />
         <input 
@@ -29,7 +29,7 @@ const CustomerImageUpload = ({ preview, handleFileChange }) => (
         />
       </label>
     </div>
-    <p className="text-xs text-gray-400 mt-2">Click camera to upload photo</p>
+    <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">Click camera to upload photo</p>
   </div>
 );
 
