@@ -49,7 +49,7 @@ const Customers = () => {
   } = useCustomers();
 
   return (
-    <div className="p-3 md:p-4 space-y-2">
+    <div className="p-3 md:p-4 space-y-2 bg-gray-100 dark:bg-gray-950 min-h-screen transition-colors duration-300">
   <CustomersHeader onAddClick={handleAddClick} />
   <CustomersSearch 
     searchTerm={searchTerm} 

@@ -2,11 +2,11 @@ import React from 'react';
 import { Check, Loader2 } from 'lucide-react';
 
 const CustomerFormActions = ({ isEdit, loading, onClose }) => (
-  <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 p-5 flex gap-3">
+  <div className="sticky bottom-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-100 dark:border-gray-700 p-5 flex gap-3">
     <button 
       type="button"
       onClick={onClose}
-      className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 transition-colors text-sm"
+      className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm"
     >
       Cancel
     </button>

@@ -15,7 +15,7 @@ const CustomersPagination = ({
   }
 
   return (
-    <div className="flex justify-between items-center mt-2 border-t pt-3">
+    <div className="flex justify-between items-center mt-2 border-t border-gray-200 dark:border-gray-700 pt-3">
       {/* Limit Dropdown */}
       <select
         value={limit}
@@ -23,7 +23,7 @@ const CustomersPagination = ({
           onLimitChange(Number(e.target.value));
           onPageChange(1); // reset to first page
         }}
-        className="border px-2 py-1 rounded text-sm"
+        className="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white px-2 py-1 rounded text-sm"
       >
         <option value={10}>10 / page</option>
         <option value={20}>20 / page</option>
@@ -35,7 +35,7 @@ const CustomersPagination = ({
         <button
           onClick={() => onPageChange(Math.max(page - 1, 1))}
           disabled={page === 1}
-          className={`px-3 py-1 border rounded ${
+          className={`px-3 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded ${
             page === 1 ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
@@ -46,9 +46,11 @@ const CustomersPagination = ({
           <button
             key={num}
             onClick={() => onPageChange(num)}
-            className={`px-3 py-1 border rounded ${
-              page === num ? "bg-blue-500 text-white" : ""
-            }`}
+            className={`px-3 py-1 border border-gray-300 dark:border-gray-700 rounded ${
+  page === num
+    ? "bg-blue-500 text-white"
+    : "bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200"
+}`}
           >
             {num}
           </button>
@@ -57,7 +59,7 @@ const CustomersPagination = ({
         <button
           onClick={() => onPageChange(Math.min(page + 1, totalPages))}
           disabled={page === totalPages}
-          className={`px-3 py-1 border rounded ${
+          className={`px-3 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded ${
             page === totalPages ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

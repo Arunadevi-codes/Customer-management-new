@@ -21,7 +21,7 @@ const CustomersSearch = ({
         <div className="relative w-full sm:max-w-xs md:max-w-sm">
           <Search 
             size={18} 
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
           />
 
           <input
@@ -29,7 +29,7 @@ const CustomersSearch = ({
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full border pl-10 pr-10 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white pl-10 pr-10 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
 
           {searchTerm && (
@@ -38,7 +38,7 @@ const CustomersSearch = ({
               onClick={() => onSearchChange("")}
               className="absolute right-3 top-1/2 -translate-y-1/2"
             >
-              <X size={16} className="text-gray-400 hover:text-red-500" />
+              <X size={16} className="text-gray-400 dark:text-gray-500 hover:text-red-500" />
             </button>
           )}
         </div>
@@ -47,7 +47,7 @@ const CustomersSearch = ({
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
 
           {/* Label */}
-          <span className="text-xs sm:text-sm text-gray-600 font-medium">
+          <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 font-medium">
             Filter by Date:
           </span>
 
@@ -57,17 +57,17 @@ const CustomersSearch = ({
               type="date"
               value={fromDate || ""}
               onChange={(e) => onFromDateChange(e.target.value)}
-              className="w-full sm:w-auto px-2 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full sm:w-auto px-2 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
-            <span className="text-gray-400 text-xs sm:text-sm">to</span>
+            <span className="text-gray-400 dark:text-gray-500 text-xs sm:text-sm">to</span>
 
             <input
               type="date"
               min={fromDate}
               value={toDate || ""}
               onChange={(e) => onToDateChange(e.target.value)}
-              className="w-full sm:w-auto px-2 py-2 border rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full sm:w-auto px-2 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
             />
 
             {/* ❌ Clear */}
@@ -90,7 +90,7 @@ const CustomersSearch = ({
 
       {/* TOTAL */}
       <div className="px-1">
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-gray-400 dark:text-gray-500">
           Total customers {total}
         </p>
       </div>

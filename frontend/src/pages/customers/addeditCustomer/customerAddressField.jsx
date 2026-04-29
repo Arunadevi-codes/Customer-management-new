@@ -12,7 +12,7 @@ const CustomerAddressFields = ({
   <div className="space-y-5">
     {/* Street Field */}
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
         <Home size={18} className="text-indigo-600" />
         Street Address
       </label>
@@ -21,13 +21,13 @@ const CustomerAddressFields = ({
         value={formData.street} 
         onChange={handleInputChange}
         placeholder="House no., Street, Area"
-        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none transition-all text-sm"
       />
     </div>
 
     {/* State Field */}
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
         <Building size={18} className="text-indigo-600" />
         State <span className="text-red-500">*</span>
       </label>
@@ -35,7 +35,7 @@ const CustomerAddressFields = ({
         <select 
           value={formData.state} 
           onChange={handleStateChange}
-          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all appearance-none bg-white text-sm cursor-pointer"
+          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none transition-all appearance-none text-sm cursor-pointer"
           disabled={loading.states}
         >
           <option value="">{loading.states ? "Loading states..." : "Select State"}</option>
@@ -54,7 +54,7 @@ const CustomerAddressFields = ({
 
     {/* City Field */}
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
         <Globe size={18} className="text-indigo-600" />
         City <span className="text-red-500">*</span>
       </label>
@@ -63,7 +63,7 @@ const CustomerAddressFields = ({
           name="city"
           value={formData.city} 
           onChange={handleInputChange}
-          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all appearance-none bg-white text-sm cursor-pointer"
+          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none transition-all appearance-none text-sm cursor-pointer"
           disabled={loading.cities || !formData.state}
         >
           <option value="">
@@ -88,7 +88,7 @@ const CustomerAddressFields = ({
 
     {/* Pincode Field */}
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+      <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
         <MapPin size={18} className="text-indigo-600" />
         Pincode
       </label>
@@ -98,7 +98,7 @@ const CustomerAddressFields = ({
         onChange={handleInputChange}
         placeholder="6-digit pincode"
         maxLength="6"
-        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all text-sm"
+        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none transition-all text-sm"
       />
     </div>
   </div>
