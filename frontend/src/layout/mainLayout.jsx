@@ -8,8 +8,6 @@ const MainLayout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const toggleSidebar = () => {
-    // On desktop: collapse/expand sidebar
-    // On mobile: this will be overridden by Topbar's logic
     setCollapsed(!collapsed);
   };
 
@@ -18,7 +16,7 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
+    <div className="flex h-screen bg-white dark:bg-gray-950">
       <Sidebar 
         collapsed={collapsed}
         setCollapsed={setCollapsed}
@@ -34,7 +32,7 @@ const MainLayout = () => {
           isMobileMenuOpen={mobileOpen}
         />
         
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-white dark:bg-gray-950">
           <Outlet />
         </main>
       </div>

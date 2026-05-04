@@ -1,0 +1,72 @@
+import React from 'react';
+import { User, Mail, Phone, AlertCircle, Calendar, Upload } from 'lucide-react';
+import { Field, SectionDivider, inputBase } from './formUI';
+
+const PersonalSection = ({ form, handleChange }) => {
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) handleChange({ target: { name: 'profileImage', files: [file] } });
+  };
+
+  return (
+    <>
+      {/* Profile Photo */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative">
+          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-indigo-50 dark:bg-indigo-900/30 border-2 border-dashed border-indigo-200 dark:border-indigo-700 shadow-sm">
+            {form.profileImage ? (
+              <img src={URL.createObjectURL(form.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <User className="w-8 h-8 text-indigo-300 dark:text-indigo-600" />
+              </div>
+            )}
+          </div>
+          <label className="absolute -bottom-2 -right-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl p-1.5 cursor-pointer shadow-lg transition-all duration-200 hover:scale-110">
+            <Upload className="w-3.5 h-3.5 text-white" />
+            <input type="file" name="profileImage" accept="image/*" onChange={handleImageUpload} className="hidden" />
+          </label>
+        </div>
+        <p className="text-[11px] text-gray-400 dark:text-gray-500">Click icon to upload photo</p>
+      </div>
+
+      {/* Personal Info Fields */}
+      <div className="space-y-4">
+        <SectionDivider label="Personal Info" />
+
+        <Field label="Full Name" required icon={User}>
+          <input type="text" name="name" placeholder="John Doe" value={form.name || ''} onChange={handleChange} className={inputBase} />
+        </Field>
+
+        <Field label="Email Address" required icon={Mail}>
+          <input type="email" name="email" placeholder="john@example.com" value={form.email || ''} onChange={handleChange} className={inputBase} />
+        </Field>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Phone" required icon={Phone}>
+            <input type="tel" name="phone" placeholder="+91 98765 43210" value={form.phone || ''} onChange={handleChange} className={inputBase} />
+          </Field>
+          <Field label="Emergency Contact" icon={AlertCircle}>
+            <input type="tel" name="emergencyPhone" placeholder="Emergency number" value={form.emergencyPhone || ''} onChange={handleChange} className={inputBase} />
+          </Field>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Gender" icon={User}>
+            <select name="gender" value={form.gender || ''} onChange={handleChange} className={`${inputBase} appearance-none`}>
+              <option value="">Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </Field>
+          <Field label="Date of Birth" icon={Calendar}>
+            <input type="date" name="dob" value={form.dob || ''} onChange={handleChange} className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert`} />
+          </Field>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default PersonalSection;

@@ -1,4 +1,3 @@
-// locationController.js
 const locationData = require("../data/locationData");
 
 // Get all states (for dropdown)

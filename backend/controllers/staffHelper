@@ -1,0 +1,49 @@
+const Staff = require("../models/Staff");
+
+const generateEmployeeId = async () => {
+  const lastStaff = await Staff.findOne()
+    .sort({ createdAt: -1 })
+    .select("employeeId");
+
+  let nextNumber = 1;
+
+  if (lastStaff?.employeeId) {
+    const lastNumber = parseInt(lastStaff.employeeId.replace("EMP", ""));
+    nextNumber = lastNumber + 1;
+  }
+
+  return `EMP${String(nextNumber).padStart(4, "0")}`;
+};
+
+const buildStaffData = async (data, profileImage) => ({
+  fullName: data.name,
+  email: data.email,
+  phone: data.phone,
+  emergencyContact: data.emergencyPhone,
+  gender: data.gender,
+  dateOfBirth: data.dob,
+  profileImage: profileImage || null,
+  addressLine: data.address,
+  city: data.city,
+  state: data.state,
+  pincode: data.pincode,
+  country: data.country,
+  role: data.role,
+  dateOfJoining: data.joiningDate,
+  status: data.status,
+  loginEmail: data.email,
+  aadhar: data.aadhar,
+  pan: data.pan,
+  bankAccountNumber: data.accountNumber,
+  ifscCode: data.ifsc,
+});
+
+const handleDuplicateError = (err, res) => {
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyPattern)[0];
+    return res.status(400).json({ message: `${field} already exists` });
+  }
+  return res.status(500).json({ success: false, error: err.message, fullError: err });
+};
+
+module.exports = { generateEmployeeId, buildStaffData, handleDuplicateError };

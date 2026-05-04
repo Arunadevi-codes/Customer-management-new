@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/login";
 import Dashboard from "./pages/dashboard";
 import Customers from "./pages/customers/customers";
+import Staff from "./pages/staff/staff";
 
 import ProtectedRoute from "./components/protectedRoute";
 import MainLayout from "./layout/mainLayout";
@@ -24,6 +25,7 @@ function App() {
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/customers" element={<Customers />} />
+              <Route path="/staff" element={<Staff />} />
             </Route>
           </Route>
 

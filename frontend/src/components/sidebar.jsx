@@ -61,7 +61,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
             <button
               key={idx}
               onClick={() => handleNavigation(item.path)}
-              className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors ${
+              className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg ${
                 item.active
                   ? 'bg-indigo-50 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400'
                   : 'text-gray-600 dark:text-gray-300 hover:bg-[#FFDAB9] dark:hover:bg-gray-800'
@@ -85,7 +85,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
               localStorage.removeItem('token');
               navigate('/');
             }}
-            className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-[#FFDAB9] dark:hover:bg-gray-800 transition-colors ${
+            className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-red-500 hover:bg-[#FFDAB9] dark:hover:bg-gray-800 ${
               (collapsed && window.innerWidth >= 768) ? 'justify-center' : ''
             }`}
           >
@@ -103,7 +103,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
     <>
       {/* Sidebar - Desktop */}
       <div
-        className={`hidden md:flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 border-t transition-all duration-300 ${
+        className={`hidden md:flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 border-t ${
           collapsed ? 'w-12' : 'w-48'
         }`}
       >
@@ -112,7 +112,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
 
       {/* Sidebar - Mobile (Slide-in) */}
       <div
-      className={`md:hidden fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 border-t z-50 transition-transform duration-300 ${
+      className={`md:hidden fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 border-t z-50  ${
         mobileOpen ? 'translate-x-0' : '-translate-x-full'
         } w-[75%] max-w-[240px]`}
       >
