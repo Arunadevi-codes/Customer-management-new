@@ -55,7 +55,7 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
       </div>
 
       {/* Main Menu */}
-      <nav className="flex-1 py-4">
+<nav className="flex-1 overflow-y-auto py-4">
         <div className="space-y-1 px-2">
           {menuItems.map((item, idx) => (
             <button
@@ -102,13 +102,13 @@ const Sidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
   return (
     <>
       {/* Sidebar - Desktop */}
-      <div
-        className={`hidden md:flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 border-t ${
-          collapsed ? 'w-12' : 'w-48'
-        }`}
-      >
-        <SidebarContent />
-      </div>
+<div
+  className={`hidden md:flex fixed top-0 left-0 z-40 flex-col h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${
+    collapsed ? 'w-12' : 'w-48'
+  }`}
+>
+  <SidebarContent />
+</div>
 
       {/* Sidebar - Mobile (Slide-in) */}
       <div

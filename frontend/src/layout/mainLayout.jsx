@@ -16,7 +16,7 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-gray-950">
+    <div className="flex min-h-screen bg-white dark:bg-gray-950 overflow-hidden">
       <Sidebar 
         collapsed={collapsed}
         setCollapsed={setCollapsed}
@@ -24,7 +24,11 @@ const MainLayout = () => {
         setMobileOpen={setMobileOpen}
       />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div
+  className={`flex-1 flex flex-col min-h-0 transition-all duration-300 ${
+    collapsed ? 'md:ml-12' : 'md:ml-48'
+  }`}
+>
         <Topbar 
           onMenuClick={toggleSidebar}
           collapsed={collapsed}
@@ -32,7 +36,7 @@ const MainLayout = () => {
           isMobileMenuOpen={mobileOpen}
         />
         
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-white dark:bg-gray-950">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 bg-white dark:bg-gray-950">
           <Outlet />
         </main>
       </div>

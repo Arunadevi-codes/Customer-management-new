@@ -1,9 +1,10 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, Trash2, AlertTriangle } from 'lucide-react';
 
 const DeleteCustomers = ({ onConfirm, onClose }) => {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  return createPortal(
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
       <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-md w-full animate-fade-in">
         {/* Modal Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
@@ -48,7 +49,8 @@ const DeleteCustomers = ({ onConfirm, onClose }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

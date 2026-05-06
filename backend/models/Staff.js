@@ -7,8 +7,8 @@ const staffSchema = new mongoose.Schema(
     email: { type: String, unique: true, required: true },
     phone: { type: String, required: true },
     emergencyContact: { type: String },
-    gender: { type: String },
-    dateOfBirth: { type: Date },
+    gender: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
     profileImage: { type: String, default: null },
 
     // STEP 2 - ADDRESS
@@ -16,7 +16,7 @@ const staffSchema = new mongoose.Schema(
     city: { type: String, required: true },
     state: { type: String, required: true },
     pincode: { type: String },
-    country: { type: String },
+    country: { type: String, required: true },
 
     // STEP 3 - JOB INFO
     role: {

@@ -10,7 +10,7 @@ const StepIndicator = ({ step, onClose }) => {
   ];
 
   return (
-    <div className="relative w-full bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
+    <div className="relative w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
       {/* Close Button */}
       <button
         onClick={onClose}

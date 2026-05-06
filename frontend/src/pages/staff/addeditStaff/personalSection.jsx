@@ -2,7 +2,7 @@ import React from 'react';
 import { User, Mail, Phone, AlertCircle, Calendar, Upload } from 'lucide-react';
 import { Field, SectionDivider, inputBase } from './formUI';
 
-const PersonalSection = ({ form, handleChange }) => {
+const PersonalSection = ({ form, handleChange, errors = {} }) => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) handleChange({ target: { name: 'profileImage', files: [file] } });
@@ -34,17 +34,29 @@ const PersonalSection = ({ form, handleChange }) => {
       <div className="space-y-4">
         <SectionDivider label="Personal Info" />
 
-        <Field label="Full Name" required icon={User}>
-          <input type="text" name="name" placeholder="John Doe" value={form.name || ''} onChange={handleChange} className={inputBase} />
+        <Field label="Full Name" required icon={User} error={errors.name}>
+          <input
+            type="text" name="name" placeholder="John Doe"
+            value={form.name || ''} onChange={handleChange}
+            className={`${inputBase} ${errors.name ? 'border-red-400 dark:border-red-500' : ''}`}
+          />
         </Field>
 
-        <Field label="Email Address" required icon={Mail}>
-          <input type="email" name="email" placeholder="john@example.com" value={form.email || ''} onChange={handleChange} className={inputBase} />
+        <Field label="Email Address" required icon={Mail} error={errors.email}>
+          <input
+            type="email" name="email" placeholder="john@example.com"
+            value={form.email || ''} onChange={handleChange}
+            className={`${inputBase} ${errors.email ? 'border-red-400 dark:border-red-500' : ''}`}
+          />
         </Field>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Phone" required icon={Phone}>
-            <input type="tel" name="phone" placeholder="+91 98765 43210" value={form.phone || ''} onChange={handleChange} className={inputBase} />
+          <Field label="Phone" required icon={Phone} error={errors.phone}>
+            <input
+              type="tel" name="phone" placeholder="+91 98765 43210"
+              value={form.phone || ''} onChange={handleChange}
+              className={`${inputBase} ${errors.phone ? 'border-red-400 dark:border-red-500' : ''}`}
+            />
           </Field>
           <Field label="Emergency Contact" icon={AlertCircle}>
             <input type="tel" name="emergencyPhone" placeholder="Emergency number" value={form.emergencyPhone || ''} onChange={handleChange} className={inputBase} />
@@ -52,16 +64,22 @@ const PersonalSection = ({ form, handleChange }) => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Gender" icon={User}>
-            <select name="gender" value={form.gender || ''} onChange={handleChange} className={`${inputBase} appearance-none`}>
+          <Field label="Gender" required icon={User} error={errors.gender}>
+            <select
+              name="gender" value={form.gender || ''} onChange={handleChange}
+              className={`${inputBase} appearance-none ${errors.gender ? 'border-red-400 dark:border-red-500' : ''}`}
+            >
               <option value="">Select gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
           </Field>
-          <Field label="Date of Birth" icon={Calendar}>
-            <input type="date" name="dob" value={form.dob || ''} onChange={handleChange} className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert`} />
+          <Field label="Date of Birth" required icon={Calendar} error={errors.dob}>
+            <input
+              type="date" name="dob" value={form.dob || ''} onChange={handleChange}
+              className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert ${errors.dob ? 'border-red-400 dark:border-red-500' : ''}`}
+            />
           </Field>
         </div>
       </div>

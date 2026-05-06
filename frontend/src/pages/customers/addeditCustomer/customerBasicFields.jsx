@@ -1,55 +1,43 @@
 import React from 'react';
 import { User, Mail, Phone } from 'lucide-react';
+import FormField, { inputBasePlain } from '../../../components/ui/formField';
 
 const CustomerBasicFields = ({ formData, handleInputChange }) => (
   <div className="space-y-5">
-    {/* Name Field */}
-    <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
-        <User size={18} className="text-indigo-600" />
-        Full Name <span className="text-red-500">*</span>
-      </label>
-      <input 
-        name="name" 
-        value={formData.name} 
+
+    <FormField label="Full Name" icon={User} required>
+      <input
+        name="name"
+        value={formData.name}
         onChange={handleInputChange}
         placeholder="Enter full name"
-        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none transition-all text-sm"
+        className={inputBasePlain}
       />
-    </div>
+    </FormField>
 
-    {/* Email Field */}
-    <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
-        <Mail size={18} className="text-indigo-600" />
-        Email Address <span className="text-red-500">*</span>
-      </label>
-      <input 
+    <FormField label="Email Address" icon={Mail} required>
+      <input
         type="email"
-        name="email" 
-        value={formData.email} 
+        name="email"
+        value={formData.email}
         onChange={handleInputChange}
         placeholder="customer@example.com"
-        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none transition-all text-sm"
+        className={inputBasePlain}
       />
-    </div>
+    </FormField>
 
-    {/* Phone Field */}
-    <div className="space-y-1.5">
-      <label className="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center gap-2">
-        <Phone size={18} className="text-indigo-600" />
-        Phone Number <span className="text-red-500">*</span>
-      </label>
-      <input 
+    <FormField label="Phone Number" icon={Phone} required>
+      <input
         type="tel"
-        name="phone" 
-        value={formData.phone} 
+        name="phone"
+        value={formData.phone}
         onChange={handleInputChange}
         placeholder="10-digit mobile number"
         maxLength="10"
-        className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none transition-all text-sm"
+        className={inputBasePlain}
       />
-    </div>
+    </FormField>
+
   </div>
 );
 

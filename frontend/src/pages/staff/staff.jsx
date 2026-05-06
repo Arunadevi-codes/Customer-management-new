@@ -1,88 +1,97 @@
 import React from "react";
 
-import StaffHeader from "./staffHeader";
-import StaffSearch from "./staffSearch";
-import StaffLoading from "./staffLoading";
+import PageHeader    from "../../components/ui/pageHeader";
+import TableSearchBar from "../../components/ui/tableSearchBar";
+import LoadingSpinner from "../../components/ui/loadingSpinner";
+
 import DeleteStaff from "./deleteStaff";
-import StaffPOPup from "./staffPOPup";
-import StaffTable from "./viewStaff/viewStaff";
-import StaffForm from "./addeditStaff/staffForm";
+import StaffPOPup  from "./staffPOPup";
+import StaffTable  from "./viewStaff/viewStaff";
+import StaffForm   from "./addeditStaff/staffForm";
 
 import { useStaff } from "./useStaff";
 
 const Staff = () => {
 
   const {
-  staffs,
-  loading,
+    staffs,
+    loading,
 
-  searchTerm,
-  handleSearch,
+    searchTerm,
+    handleSearch,
 
-  viewStaff,
-  setViewStaff,
+    viewStaff,
+    setViewStaff,
 
-  isModalOpen,
-  setIsModalOpen,
-  editingStaff,
+    isModalOpen,
+    setIsModalOpen,
+    editingStaff,
 
-  isDeleteModalOpen,
-  setIsDeleteModalOpen,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
 
-  total,
+    total,
 
-  handleAddClick,
-  handleEditClick,
-  handleDeleteClick,
-  handleSaveStaff,
-  handleConfirmDelete,
+    handleAddClick,
+    handleEditClick,
+    handleDeleteClick,
+    handleSaveStaff,
+    handleConfirmDelete,
 
-  sortField,
-  sortOrder,
-  handleSort,
-  handleViewClick,
-  fromDate,
-toDate,
-setFromDate,
-setToDate,
-} = useStaff();
+    sortField,
+    sortOrder,
+    handleSort,
+    handleViewClick,
+
+    fromDate,
+    toDate,
+    setFromDate,
+    setToDate,
+  } = useStaff();
 
   return (
     <div className="p-3 md:p-4 space-y-3 min-h-screen">
 
       {/* HEADER */}
-      <StaffHeader
-        onAddClick={handleAddClick}
+      <PageHeader
+        title="Staff"
+        subtitle="Manage your staff database"
+        addLabel="Add Staff"
+        addLabelMob="Add"
         totalCount={total}
+        onAddClick={handleAddClick}
       />
 
-      {/* SEARCH */}
-      <StaffSearch
+      {/* SEARCH + DATE FILTER */}
+      <TableSearchBar
         searchTerm={searchTerm}
         onSearchChange={handleSearch}
         total={total}
+        totalLabel="staff"
+        placeholder="Search staff..."
         fromDate={fromDate}
         toDate={toDate}
         onFromDateChange={setFromDate}
         onToDateChange={setToDate}
+        focusColor="orange"
       />
 
       {/* TABLE / LOADING */}
       {loading ? (
-        <StaffLoading />
+        <LoadingSpinner label="Loading staff..." />
       ) : (
         <StaffTable
           staffs={staffs}
           onEdit={handleEditClick}
           onDelete={handleDeleteClick}
-          onView={handleViewClick} 
+          onView={handleViewClick}
           onSort={handleSort}
           sortField={sortField}
           sortOrder={sortOrder}
         />
       )}
 
-      {/* FORM MODAL (STEP FORM) */}
+      {/* ADD / EDIT FORM MODAL */}
       {isModalOpen && (
         <StaffForm
           staff={editingStaff}
@@ -91,19 +100,21 @@ setToDate,
         />
       )}
 
+      {/* DELETE CONFIRM MODAL */}
       {isDeleteModalOpen && (
-  <DeleteStaff
-    onConfirm={handleConfirmDelete}
-    onClose={() => setIsDeleteModalOpen(false)}
-  />
-)}
+        <DeleteStaff
+          onConfirm={handleConfirmDelete}
+          onClose={() => setIsDeleteModalOpen(false)}
+        />
+      )}
 
-    {viewStaff && (
-  <StaffPOPup
-    staff={viewStaff}
-    onClose={() => setViewStaff(null)}
-  />
-)}
+      {/* VIEW POPUP */}
+      {viewStaff && (
+        <StaffPOPup
+          staff={viewStaff}
+          onClose={() => setViewStaff(null)}
+        />
+      )}
 
     </div>
   );

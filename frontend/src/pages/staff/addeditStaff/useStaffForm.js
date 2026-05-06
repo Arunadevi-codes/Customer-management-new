@@ -8,6 +8,7 @@ const useStaffForm = (staff) => {
   const [loading, setLoading] = useState(false);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [errors, setErrors] = useState({});
   const [locationLoading, setLocationLoading] = useState({
     states: false,
     cities: false,
@@ -26,7 +27,7 @@ const useStaffForm = (staff) => {
     state: "",
     pincode: "",
     country: "",
-    role: "staff",
+    role: "",
     employeeId: "",
     joiningDate: "",
     status: "active",
@@ -137,31 +138,52 @@ const useStaffForm = (staff) => {
   };
 
   // VALIDATION PER STEP
-  const validateStep = () => {
-    if (step === 1 && (!form.name || !form.email || !form.phone))
-      return "Fill all personal details";
-    if (step === 2 && (!form.role || !form.joiningDate))
-      return "Fill job details";
-    if (step === 3 && !isEdit) {
-      if (!form.email || !form.password || !form.confirmPassword)
-        return "Fill login credentials";
-      if (form.password !== form.confirmPassword)
-        return "Passwords do not match";
+  // Replace validateStep function
+const validateStep = () => {
+  if (step === 1) {
+    const newErrors = {};
+    if (!form.name) newErrors.name = "Full name is required";
+    if (!form.email) newErrors.email = "Email is required";
+    if (!form.phone) newErrors.phone = "Phone is required";
+    if (!form.gender) newErrors.gender = "Gender is required";
+    if (!form.dob) newErrors.dob = "Date of birth is required";
+    if (!form.address) newErrors.address = "Address is required";
+    if (!form.state) newErrors.state = "State is required";
+    if (!form.city) newErrors.city = "City is required";
+    if (!form.country) newErrors.country = "Country is required";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return "validation_error"; // sentinel — do NOT toast
     }
-    return null;
-  };
+    setErrors({});
+  }
+
+  if (step === 2 && (!form.role || !form.joiningDate))
+    return "Fill job details";
+  if (step === 3 && !isEdit) {
+    if (!form.email || !form.password || !form.confirmPassword)
+      return "Fill login credentials";
+    if (form.password !== form.confirmPassword)
+      return "Passwords do not match";
+  }
+  return null;
+};
 
   const nextStep = () => {
-    const error = validateStep();
-    if (error) return toast.error(error);
+  const error = validateStep();
+  if (!error) {
     setStep((prev) => prev + 1);
-  };
+  } else if (error !== "validation_error") {
+    toast.error(error); // only toast for non-step-1 errors
+  }
+};
 
   const prevStep = () => setStep((prev) => prev - 1);
 
   return {
     isEdit, step, loading, setLoading,
-    form, states, cities, locationLoading,
+    form, errors, states, cities, locationLoading,
     handleChange, handleStateChange,
     validateStep, nextStep, prevStep,
   };

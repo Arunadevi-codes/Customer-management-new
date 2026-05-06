@@ -1,78 +1,77 @@
 const Staff = require("../models/Staff");
-const { generateEmployeeId } = require("./staffHelper");
 
-// GET NEXT EMPLOYEE ID
+const { generateEmployeeId }            = require("../helpers/staffHelper");
+const { buildSearchQuery, buildDateQuery, getPagination, getSortOptions } = require("../helpers/queryHelper");
+
+//  GET NEXT EMPLOYEE ID
+
 exports.getNextEmployeeId = async (req, res) => {
   try {
     const employeeId = await generateEmployeeId();
     res.json({ employeeId });
+
   } catch (err) {
     console.error("getNextEmployeeId error:", err);
     res.status(500).json({ message: err.message, stack: err.stack });
   }
 };
 
-// GET ALL STAFF
+//  GET ALL  (with search / date filter / sort / pagination)
+
 exports.getStaff = async (req, res) => {
   try {
-    const offset = parseInt(req.query.offset) || 0;
-    const limit = parseInt(req.query.limit) || 10;
-    const search = req.query.search || "";
-    const { fromDate, toDate } = req.query;
+    // ── Pagination ──────────────────────────
+    const { limit, skip } = getPagination(req.query);
 
-    const query = {};
+    // ── Filters ─────────────────────────────
+    const searchQuery = buildSearchQuery(req.query.search, ["fullName", "email", "phone"]);
+    const dateQuery   = buildDateQuery(req.query.fromDate, req.query.toDate);
 
-    // SEARCH
-    if (search) {
-      query.$or = [
-        { fullName: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
-      ];
-    }
+    const query = { ...searchQuery, ...dateQuery };
 
-    // DATE FILTER
-    if (fromDate || toDate) {
-      query.createdAt = {};
-      if (fromDate) query.createdAt.$gte = new Date(fromDate);
-      if (toDate) {
-        const endDate = new Date(toDate);
-        endDate.setHours(23, 59, 59, 999);
-        query.createdAt.$lte = endDate;
-      }
-    }
+    // ── Sort ────────────────────────────────
+    const { sortField, sortOrder, needsCollation } = getSortOptions(
+      req.query,
+      "createdAt",
+      ["fullName", "email", "phone"]   // fields that need locale-aware collation
+    );
 
-    // SORT
-    const sortField = req.query.sortField || "createdAt";
-    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
-    const isStringField = ["fullName", "email", "phone"].includes(sortField);
-
-    const query_builder = Staff.find(query)
+    // ── Query ───────────────────────────────
+    const queryBuilder = Staff.find(query)
       .select("-password")
       .sort({ [sortField]: sortOrder })
-      .skip(offset * limit)
+      .skip(skip)
       .limit(limit);
 
-    if (isStringField) query_builder.collation({ locale: "en", strength: 2 });
+    if (needsCollation) {
+      queryBuilder.collation({ locale: "en", strength: 2 });
+    }
 
-    const staffs = await query_builder;
-    const total = await Staff.countDocuments(query);
+    const staffs = await queryBuilder;
+    const total  = await Staff.countDocuments(query);
 
     res.json({ staffs, total });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// GET SINGLE STAFF
+//  GET ONE
+
 exports.getStaffById = async (req, res) => {
   try {
     const staff = await Staff.findById(req.params.id);
-    if (!staff) return res.status(404).json({ message: "Staff not found" });
+
+    if (!staff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
 
     const safeStaff = staff.toObject();
     delete safeStaff.password;
+
     res.json(safeStaff);
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

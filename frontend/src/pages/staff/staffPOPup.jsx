@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import {
   X, User, Mail, Phone, MapPin, Calendar,
   Briefcase, IdCard, Activity, AlertCircle,
@@ -17,9 +18,9 @@ const StaffPOPup = ({ staff, onClose }) => {
     ? staff.role.charAt(0).toUpperCase() + staff.role.slice(1)
     : "—";
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-end sm:items-center z-50 p-2 sm:p-4"
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-end sm:items-center z-[999] p-2 sm:p-4"
       onClick={onClose}
     >
       <div
@@ -62,7 +63,6 @@ const StaffPOPup = ({ staff, onClose }) => {
 
         {/* Content */}
         <div className="p-4 sm:p-5 space-y-1">
-
           <SectionLabel label="Personal Info" />
           <Detail icon={<Mail size={16} />}        label="Email"             value={staff.email} />
           <Detail icon={<Phone size={16} />}       label="Phone"             value={staff.phone} />
@@ -78,20 +78,20 @@ const StaffPOPup = ({ staff, onClose }) => {
           <Detail icon={<Calendar size={16} />}   label="Account Created" value={formatDate(staff.createdAt)} />
 
           <SectionLabel label="Address" />
-          <Detail icon={<MapPin size={16} />}   label="Street Address" value={staff.addressLine} />
-          <Detail icon={<Building2 size={16} />} label="City / State"  value={`${getCityName(staff.state, staff.city)}, ${getStateName(staff.state)}`} />
-          <Detail icon={<MapPin size={16} />}   label="Pincode"        value={staff.pincode} />
-          <Detail icon={<Globe size={16} />}    label="Country"        value={staff.country} />
+          <Detail icon={<MapPin size={16} />}    label="Street Address" value={staff.addressLine} />
+          <Detail icon={<Building2 size={16} />} label="City / State"   value={`${getCityName(staff.state, staff.city)}, ${getStateName(staff.state)}`} />
+          <Detail icon={<MapPin size={16} />}    label="Pincode"        value={staff.pincode} />
+          <Detail icon={<Globe size={16} />}     label="Country"        value={staff.country} />
 
           <SectionLabel label="Documents & Banking" />
           <Detail icon={<IdCard size={16} />}     label="Aadhar"         value={staff.aadhar} />
           <Detail icon={<FileText size={16} />}   label="PAN"            value={staff.pan} />
           <Detail icon={<CreditCard size={16} />} label="Account Number" value={staff.bankAccountNumber} />
           <Detail icon={<Building2 size={16} />}  label="IFSC Code"      value={staff.ifscCode} />
-
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

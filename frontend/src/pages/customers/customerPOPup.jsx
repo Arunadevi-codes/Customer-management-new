@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { X, User, Mail, Phone, MapPin, Calendar } from "lucide-react";
 import statesData from "../../data/statesData";
 import "@fontsource/poppins/400.css";
@@ -8,17 +9,16 @@ import "@fontsource/poppins/600.css";
 const ViewCustomer = ({ customer, onClose }) => {
   if (!customer) return null;
 
-const getStateName = (stateId) => {
-  return statesData[stateId]?.name || "—";
-};
+  const getStateName = (stateId) => {
+    return statesData[stateId]?.name || "—";
+  };
 
-const getCityName = (stateId, cityId) => {
-  const state = statesData[stateId];
-  if (!state) return "—";
-
-  const city = state.cities.find(c => String(c.id) === String(cityId));
-  return city ? city.name : "—";
-};
+  const getCityName = (stateId, cityId) => {
+    const state = statesData[stateId];
+    if (!state) return "—";
+    const city = state.cities.find(c => String(c.id) === String(cityId));
+    return city ? city.name : "—";
+  };
 
   const stateName = getStateName(customer.state);
   const cityName = getCityName(customer.state, customer.city);
@@ -31,24 +31,19 @@ const getCityName = (stateId, cityId) => {
       })
     : "—";
 
-    const imageUrl = customer.image
-  ? `http://localhost:5000/uploads/${customer.image}`
-  : null;
+  const imageUrl = customer.image
+    ? `http://localhost:5000/uploads/${customer.image}`
+    : null;
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-end sm:items-center z-50 p-2 sm:p-4 font-[Poppins]"
+      className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-end sm:items-center z-[999] p-2 sm:p-4 font-[Poppins]"
       onClick={onClose}
     >
       <div
-  className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl 
-  w-[95%] sm:w-full 
-  max-w-sm sm:max-w-md md:max-w-lg 
-  mx-auto 
-  max-h-[85vh] 
-  overflow-y-auto"
-  onClick={(e) => e.stopPropagation()}
->
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-[95%] sm:w-full max-w-sm sm:max-w-md md:max-w-lg mx-auto max-h-[85vh] overflow-y-auto [&::-webkit-scrollbar]:hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-2xl p-3 sm:p-5 md:p-6 text-white sticky top-0 z-10">
           <button
@@ -60,37 +55,26 @@ const getCityName = (stateId, cityId) => {
 
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-white/20 flex items-center justify-center">
-  {imageUrl ? (
-    <img
-      src={imageUrl}
-      alt="profile"
-      className="w-full h-full object-cover"
-    />
-  ) : (
-    <User size={22} />
-  )}
-</div>
+              {imageUrl ? (
+                <img src={imageUrl} alt="profile" className="w-full h-full object-cover" />
+              ) : (
+                <User size={22} />
+              )}
+            </div>
             <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
-                Customer Details
-              </h2>
-              <p className="text-[10px] sm:text-xs md:text-sm text-indigo-100">
-                View complete information
-              </p>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold">Customer Details</h2>
+              <p className="text-[10px] sm:text-xs md:text-sm text-indigo-100">View complete information</p>
             </div>
           </div>
         </div>
 
         {/* Content */}
         <div className="p-3 sm:p-5 md:p-6 space-y-3 sm:space-y-4">
-
-          <Detail icon={<User size={18} />} label="Full Name" value={customer.name} />
-          <Detail icon={<Mail size={18} />} label="Email Address" value={customer.email} />
-          <Detail icon={<Phone size={18} />} label="Phone Number" value={customer.phone} />
-          <Detail icon={<Calendar size={18} />} label="Created Date" value={formattedDate} />
-          <Detail icon={<MapPin size={18} />} label="Street Address" value={customer.street} />
-
-          {/* ✅ FIXED LOCATION */}
+          <Detail icon={<User size={18} />}     label="Full Name"      value={customer.name} />
+          <Detail icon={<Mail size={18} />}     label="Email Address"  value={customer.email} />
+          <Detail icon={<Phone size={18} />}    label="Phone Number"   value={customer.phone} />
+          <Detail icon={<Calendar size={18} />} label="Created Date"   value={formattedDate} />
+          <Detail icon={<MapPin size={18} />}   label="Street Address" value={customer.street} />
           <Detail
             icon={<MapPin size={18} />}
             label="State and City"
@@ -104,12 +88,11 @@ const getCityName = (stateId, cityId) => {
                 : "—"
             }
           />
-
           <Detail icon={<MapPin size={18} />} label="PIN Code" value={customer.pincode} />
-
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

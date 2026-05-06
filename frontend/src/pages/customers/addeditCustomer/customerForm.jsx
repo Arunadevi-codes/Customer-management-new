@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { toast } from 'react-toastify';
 import API from "../../../services/api";
 
@@ -23,8 +24,8 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
   });
 
   const [preview, setPreview] = useState(
-    customer?.image 
-      ? `http://localhost:5000/uploads/${customer.image}` 
+    customer?.image
+      ? `http://localhost:5000/uploads/${customer.image}`
       : null
   );
 
@@ -36,6 +37,16 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
     cities: false,
     submitting: false
   });
+
+  useEffect(() => {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -60,7 +71,6 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
     try {
       const res = await API.get("/states");
       const data = res.data;
-
       if (data.success) setStates(data.states);
       else if (Array.isArray(data)) setStates(data);
     } catch {
@@ -72,12 +82,10 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
 
   const loadCities = async (stateId) => {
     if (!stateId) return setCities([]);
-
     setLoading(prev => ({ ...prev, cities: true }));
     try {
       const res = await API.get(`/cities?stateId=${stateId}`);
       const data = res.data;
-
       if (data.success) setCities(data.cities);
       else if (Array.isArray(data)) setCities(data);
       else setCities([]);
@@ -95,26 +103,17 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-
     if (file && file.size > 5 * 1024 * 1024) {
       toast.error("Image size should be less than 5MB");
       return;
     }
-
     setFormData({ ...formData, image: file });
-
     if (file) setPreview(URL.createObjectURL(file));
   };
 
   const handleStateChange = async (e) => {
     const stateId = e.target.value;
-
-    setFormData(prev => ({
-      ...prev,
-      state: stateId,
-      city: ''
-    }));
-
+    setFormData(prev => ({ ...prev, state: stateId, city: '' }));
     if (stateId) await loadCities(stateId);
     else setCities([]);
   };
@@ -160,13 +159,13 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] flex flex-col transition-colors duration-300">
 
         <CustomerFormHeader isEdit={isEdit} onClose={onClose} />
 
-        <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 custom-scrollbar">
+        <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 [&::-webkit-scrollbar]:hidden">
           <div className="p-5 space-y-5">
 
             <CustomerImageUpload preview={preview} handleFileChange={handleFileChange} />
@@ -191,7 +190,8 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
           />
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

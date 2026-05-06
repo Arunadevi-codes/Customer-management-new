@@ -72,7 +72,7 @@ const Topbar = ({
   };
 
   return (
-    <header className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm ">
+    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 flex items-center justify-between relative z-10 shadow-sm">
       
       {/* Left side */}
       <div className="flex items-center space-x-4">
