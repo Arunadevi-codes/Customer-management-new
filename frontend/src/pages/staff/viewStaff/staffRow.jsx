@@ -5,13 +5,24 @@ const StaffRow = ({ staff, onEdit, onDelete, onView }) => {
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 });
 
   const handleMouseEnter = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setTooltip({
-      visible: true,
-      x: rect.left,
-      y: rect.bottom + window.scrollY + 6,
-    });
-  };
+  const rect = e.currentTarget.getBoundingClientRect();
+
+  const tooltipWidth = 280; // same as max-w-[280px]
+  const padding = 12;
+
+  let left = rect.left;
+
+  // Prevent tooltip from going outside screen
+  if (left + tooltipWidth > window.innerWidth) {
+    left = window.innerWidth - tooltipWidth - padding;
+  }
+
+  setTooltip({
+    visible: true,
+    x: left,
+    y: rect.bottom + 8,
+  });
+};
 
   const handleMouseLeave = () => {
     setTooltip({ visible: false, x: 0, y: 0 });
@@ -55,7 +66,7 @@ const StaffRow = ({ staff, onEdit, onDelete, onView }) => {
       {/* EMAIL */}
       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
         <div
-          className="truncate max-w-[200px] cursor-default"
+          className="truncate max-w-[260px] cursor-default"
           onMouseEnter={staff.email ? handleMouseEnter : undefined}
           onMouseLeave={staff.email ? handleMouseLeave : undefined}
         >
@@ -65,11 +76,11 @@ const StaffRow = ({ staff, onEdit, onDelete, onView }) => {
         {/* ✅ Fixed-position tooltip — escapes overflow:hidden/auto entirely */}
         {tooltip.visible && staff.email && (
           <div
-            className="fixed z-[9999] bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg px-3 py-2 shadow-lg max-w-[280px] break-all pointer-events-none"
-            style={{ top: tooltip.y, left: tooltip.x }}
-          >
-            {staff.email}
-          </div>
+  className="fixed z-[9999] bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg px-3 py-2 shadow-lg max-w-[280px] break-words whitespace-normal pointer-events-none"
+  style={{ top: tooltip.y, left: tooltip.x }}
+>
+  {staff.email}
+</div>
         )}
       </td>
 

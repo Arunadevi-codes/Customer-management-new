@@ -53,7 +53,9 @@ exports.getStaff = async (req, res) => {
     res.json({ staffs, total });
 
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message || "Failed to fetch staff",
+    });
   }
 };
 
@@ -73,6 +75,8 @@ exports.getStaffById = async (req, res) => {
     res.json(safeStaff);
 
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message || "Failed to fetch staff details",
+    });
   }
 };

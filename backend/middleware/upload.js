@@ -8,15 +8,19 @@ const ensureDir = (dirPath) => {
 };
 
 // ── Allowed image types ────────────────────────────────────────
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|webp/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = allowedTypes.test(file.mimetype);
+const ALLOWED_TYPES = /jpeg|jpg|png|webp/;
+const ALLOWED_LABEL = "JPG, JPEG, PNG, or WEBP";
 
-  if (extname && mimetype) {
+const fileFilter = (req, file, cb) => {
+  const ext     = path.extname(file.originalname).toLowerCase().replace(".", "");
+  const extOk   = ALLOWED_TYPES.test(ext);
+  const mimeOk  = ALLOWED_TYPES.test(file.mimetype);
+
+  if (extOk && mimeOk) {
     cb(null, true);
   } else {
-    cb(new Error("Only image files are allowed"));
+    // This error will be caught by the route-level error handler
+    cb(new Error(`Invalid file type ".${ext}". Only ${ALLOWED_LABEL} images are allowed.`));
   }
 };
 
@@ -25,8 +29,8 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     let folder = "uploads/staff"; // default
 
-    if (file.fieldname === "aadharImage") folder = "uploads/aadhar";
-    else if (file.fieldname === "panImage")   folder = "uploads/pan";
+    if (file.fieldname === "aadharImage")   folder = "uploads/aadhar";
+    else if (file.fieldname === "panImage") folder = "uploads/pan";
     else if (file.fieldname === "profileImage") folder = "uploads/staff";
 
     ensureDir(folder);

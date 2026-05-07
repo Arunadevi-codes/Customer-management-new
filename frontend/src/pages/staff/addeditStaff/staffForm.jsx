@@ -30,24 +30,31 @@ const StaffForm = ({ staff, onClose, onSave }) => {
   } = useStaffForm(staff);
 
   const handleSubmit = async () => {
-    const error = validateStep();
-    if (error) return toast.error(error);
+  const error = validateStep();
+  if (error) return toast.error(error);
 
-    setLoading(true);
-    try {
-      const data = new FormData();
-      Object.keys(form).forEach((key) => {
-        if (form[key] !== null && form[key] !== undefined && form[key] !== "") {
-          data.append(key, form[key]);
-        }
-      });
-      await onSave(data, staff?._id);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to save staff");
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  try {
+    const data = new FormData();
+
+    Object.keys(form).forEach((key) => {
+      if (form[key] !== null && form[key] !== undefined && form[key] !== "") {
+        data.append(key, form[key]);
+      }
+    });
+
+    // ✅ Tell backend to clear profileImage if removed in edit mode
+    if (isEdit && form.profileImage === null) {
+      data.append("removeProfileImage", "true");
     }
-  };
+
+    await onSave(data, staff?._id);
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Failed to save staff");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return createPortal(
     <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 z-[999]">

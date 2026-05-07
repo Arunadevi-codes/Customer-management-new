@@ -3,6 +3,22 @@ import { toast } from "react-toastify";
 import API from "../../services/api";
 import useStaffFetch from "./useStaffFetch";
 
+// ── Extract the most meaningful error message from an axios error ──
+const getErrorMessage = (err) => {
+  const data = err.response?.data;
+  if (!data) return "Network error — please try again";
+
+  // Validation errors array: [{ field, message }]
+  if (data.errors?.length) {
+    return data.errors.map((e) => `${e.field}: ${e.message}`).join("\n");
+  }
+
+  // Single message string
+  if (data.message) return data.message;
+
+  return "Something went wrong";
+};
+
 export const useStaff = () => {
   const fetch = useStaffFetch();
 
@@ -13,9 +29,9 @@ export const useStaff = () => {
   const [viewStaff, setViewStaff] = useState(null);
 
   // MODAL ACTIONS
-  const handleAddClick = () => { setEditingStaff(null); setIsModalOpen(true); };
-  const handleEditClick = (staff) => { setEditingStaff(staff); setIsModalOpen(true); };
-  const handleViewClick = (staff) => { setViewStaff(staff); };
+  const handleAddClick    = () => { setEditingStaff(null); setIsModalOpen(true); };
+  const handleEditClick   = (staff) => { setEditingStaff(staff); setIsModalOpen(true); };
+  const handleViewClick   = (staff) => { setViewStaff(staff); };
   const handleDeleteClick = (id) => { setSelectedStaffId(id); setIsDeleteModalOpen(true); };
 
   // DELETE
@@ -29,7 +45,7 @@ export const useStaff = () => {
       setSelectedStaffId(null);
     } catch (err) {
       console.error("Delete error:", err.response?.status, err.response?.data);
-      toast.error("Delete failed");
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -55,7 +71,15 @@ export const useStaff = () => {
       setEditingStaff(null);
     } catch (err) {
       console.log(err.response?.data);
-      toast.error(err.response?.data?.message || "Something went wrong");
+
+      // Multiple validation errors — show each as a separate toast
+      if (err.response?.data?.errors?.length > 1) {
+        err.response.data.errors.forEach((e) =>
+          toast.error(`${e.field}: ${e.message}`)
+        );
+      } else {
+        toast.error(getErrorMessage(err));
+      }
     }
   };
 

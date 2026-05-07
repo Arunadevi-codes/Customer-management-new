@@ -23,20 +23,47 @@ const PersonalSection = ({ form, handleChange, errors = {} }) => {
       {/* Profile Photo */}
       <div className="flex flex-col items-center gap-3">
         <div className="relative">
-          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-indigo-50 dark:bg-indigo-900/30 border-2 border-dashed border-indigo-200 dark:border-indigo-700 shadow-sm">
-            {imageSrc ? (
-              <img src={imageSrc} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <User className="w-8 h-8 text-indigo-300 dark:text-indigo-600" />
-              </div>
-            )}
-          </div>
-          <label className="absolute -bottom-2 -right-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl p-1.5 cursor-pointer shadow-lg transition-all duration-200 hover:scale-110">
-            <Upload className="w-3.5 h-3.5 text-white" />
-            <input type="file" name="profileImage" accept="image/*" onChange={handleImageUpload} className="hidden" />
-          </label>
-        </div>
+  <div className="w-24 h-24 rounded-2xl overflow-hidden bg-indigo-50 dark:bg-indigo-900/30 border-2 border-dashed border-indigo-200 dark:border-indigo-700 shadow-sm">
+    {imageSrc ? (
+      <img
+        src={imageSrc}
+        alt="Profile"
+        className="w-full h-full object-cover"
+      />
+    ) : (
+      <div className="w-full h-full flex items-center justify-center">
+        <User className="w-8 h-8 text-indigo-300 dark:text-indigo-600" />
+      </div>
+    )}
+  </div>
+
+  {/* Upload Button */}
+  <label className="absolute -bottom-2 -right-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl p-1.5 cursor-pointer shadow-lg transition-all duration-200 hover:scale-110">
+    <Upload className="w-3.5 h-3.5 text-white" />
+    <input
+      type="file"
+      name="profileImage"
+      accept="image/*"
+      onChange={handleImageUpload}
+      className="hidden"
+    />
+  </label>
+
+  {/* Remove Image Button */}
+  {imageSrc && (
+    <button
+      type="button"
+      onClick={() =>
+        handleChange({
+          target: { name: "profileImage", value: "" },
+        })
+      }
+      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md"
+    >
+      ×
+    </button>
+  )}
+</div>
         <p className="text-[11px] text-gray-400 dark:text-gray-500">Click icon to upload photo</p>
       </div>
 

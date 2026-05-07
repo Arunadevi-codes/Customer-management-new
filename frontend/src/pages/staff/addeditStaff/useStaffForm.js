@@ -131,14 +131,15 @@ const useStaffForm = (staff) => {
   };
 
   // ── HANDLE INPUT ──────────────────────────────────────────
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (files) {
-      setForm((prev) => ({ ...prev, [name]: files[0] }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value ?? null }));
-    }
-  };
+const handleChange = (e) => {
+  const { name, value, files } = e.target;
+  if (files) {
+    setForm((prev) => ({ ...prev, [name]: files[0] }));
+  } else {
+    // ✅ treat empty string as null (handles image removal)
+    setForm((prev) => ({ ...prev, [name]: value === "" ? null : (value ?? null) }));
+  }
+};
 
   // ── HANDLE STATE CHANGE ───────────────────────────────────
   const handleStateChange = (e) => {

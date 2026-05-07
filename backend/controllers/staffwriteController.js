@@ -67,6 +67,7 @@ exports.createStaff = async (req, res) => {
 };
 
 // UPDATE
+// UPDATE
 exports.updateStaff = async (req, res) => {
   try {
     const staff = await Staff.findById(req.params.id);
@@ -78,6 +79,12 @@ exports.updateStaff = async (req, res) => {
     if (images.profileImage) deleteFile(staff.profileImage);
     if (images.aadharImage)  deleteFile(staff.aadharImage);
     if (images.panImage)     deleteFile(staff.panImage);
+
+    // ✅ If frontend explicitly removed the profile image
+    if (req.body.removeProfileImage === "true" && !images.profileImage) {
+      deleteFile(staff.profileImage);
+      images.profileImage = null; // set to null in DB
+    }
 
     const updated = await Staff.findByIdAndUpdate(
       req.params.id,
@@ -111,6 +118,8 @@ exports.deleteStaff = async (req, res) => {
     await staff.deleteOne();
     res.json({ message: "Staff deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      message: err.message || "Delete failed",
+    });
   }
 };
