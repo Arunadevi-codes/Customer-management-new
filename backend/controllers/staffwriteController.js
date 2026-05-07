@@ -1,99 +1,115 @@
-const fs      = require("fs");
-const path    = require("path");
-const bcrypt  = require("bcryptjs");
-
 const Staff = require("../models/Staff");
+const { generateEmployeeId } = require("../helpers/staffHelper");
+const fs = require("fs");
+const path = require("path");
 
-const {
-  generateEmployeeId,
-  buildStaffData,
-  handleDuplicateError,
-} = require("../helpers/staffHelper");
+const deleteFile = (filePath) => {
+  if (filePath) fs.unlink(path.resolve(filePath), () => {});
+};
 
-//  CREATE
+const extractFiles = (files = {}) => ({
+  profileImage: files.profileImage?.[0]?.path ?? undefined,
+  aadharImage:  files.aadharImage?.[0]?.path  ?? undefined,
+  panImage:     files.panImage?.[0]?.path      ?? undefined,
+});
+
+// ── Sanitize body: strip empty strings, parse dates ────────────
+const sanitizeBody = (body) => {
+  const cleaned = {};
+
+  for (const [key, value] of Object.entries(body)) {
+    // Skip empty strings so required fields fail clearly
+    if (value === "" || value === undefined) continue;
+
+    // Parse known date fields
+    if (["dateOfBirth", "dateOfJoining"].includes(key)) {
+      const parsed = new Date(value);
+      if (!isNaN(parsed)) cleaned[key] = parsed;
+      continue;
+    }
+
+    cleaned[key] = value;
+  }
+
+  return cleaned;
+};
+
+// CREATE
 exports.createStaff = async (req, res) => {
   try {
-    const data         = req.body;
-    const profileImage = req.file ? req.file.filename : null;
+    const employeeId = await generateEmployeeId();
+    const images = extractFiles(req.files);
+    const body   = sanitizeBody(req.body);
 
-    // Use provided employeeId, or auto-generate one
-    const employeeId = data.employeeId || await generateEmployeeId();
+    const staff = new Staff({
+      ...body,
+      employeeId,
+      ...images,
+    });
 
-    // Build the document fields from request body
-    const staffData = buildStaffData(data, profileImage);
+    await staff.save();
 
-    staffData.employeeId = employeeId;
-    staffData.password   = await bcrypt.hash(data.password, 10);
-
-    const saved = await new Staff(staffData).save();
-
-    const safeStaff = saved.toObject();
+    const safeStaff = staff.toObject();
     delete safeStaff.password;
 
-    res.json(safeStaff);
-
+    res.status(201).json(safeStaff);
   } catch (err) {
-    console.log(err);
-    return handleDuplicateError(err, res);
+    // Return each validation error clearly
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map((e) => ({
+        field: e.path,
+        message: e.message,
+      }));
+      return res.status(400).json({ message: "Validation failed", errors });
+    }
+    res.status(400).json({ message: err.message });
   }
 };
 
-//  UPDATE
+// UPDATE
 exports.updateStaff = async (req, res) => {
   try {
-    const data = req.body;
+    const staff = await Staff.findById(req.params.id);
+    if (!staff) return res.status(404).json({ message: "Staff not found" });
 
-    // Build update payload from request body
-    const updateData = buildStaffData(data, null);
+    const images = extractFiles(req.files);
+    const body   = sanitizeBody(req.body);
 
-    updateData.employeeId = data.employeeId || undefined;
-
-    // Only hash and update password if a new one was supplied
-    if (data.password) {
-      updateData.password = await bcrypt.hash(data.password, 10);
-    }
-
-    // Replace profile image only if a new file was uploaded
-    if (req.file) {
-      updateData.profileImage = req.file.filename;
-    }
+    if (images.profileImage) deleteFile(staff.profileImage);
+    if (images.aadharImage)  deleteFile(staff.aadharImage);
+    if (images.panImage)     deleteFile(staff.panImage);
 
     const updated = await Staff.findByIdAndUpdate(
       req.params.id,
-      updateData,
-      { returnDocument: "after", runValidators: true }
-    );
+      { ...body, ...images },
+      { new: true, runValidators: true }
+    ).select("-password");
 
-    const safeUpdated = updated.toObject();
-    delete safeUpdated.password;
-
-    res.json(safeUpdated);
-
+    res.json(updated);
   } catch (err) {
-    console.log(err);
-    return handleDuplicateError(err, res);
+    if (err.name === "ValidationError") {
+      const errors = Object.values(err.errors).map((e) => ({
+        field: e.path,
+        message: e.message,
+      }));
+      return res.status(400).json({ message: "Validation failed", errors });
+    }
+    res.status(400).json({ message: err.message });
   }
 };
 
-//  DELETE
+// DELETE
 exports.deleteStaff = async (req, res) => {
   try {
     const staff = await Staff.findById(req.params.id);
+    if (!staff) return res.status(404).json({ message: "Staff not found" });
 
-    if (!staff) {
-      return res.status(404).json({ message: "Staff not found" });
-    }
+    deleteFile(staff.profileImage);
+    deleteFile(staff.aadharImage);
+    deleteFile(staff.panImage);
 
-    // Remove associated profile image from disk
-    if (staff.profileImage) {
-      const imgPath = path.join(__dirname, "..", "uploads", "staff", staff.profileImage);
-      fs.unlink(imgPath, () => {});
-    }
-
-    await Staff.findByIdAndDelete(req.params.id);
-
+    await staff.deleteOne();
     res.json({ message: "Staff deleted successfully" });
-
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -1,6 +1,10 @@
 import React from 'react';
 import { User, Mail, Phone, AlertCircle, Calendar, Upload } from 'lucide-react';
-import { Field, SectionDivider, inputBase } from './formUI';
+import FormField, { inputBase } from '../../../components/ui/formField';
+import SectionDivider from '../../../components/ui/sectionDivider';
+
+// Today's date in YYYY-MM-DD format — used to block future dates in DOB picker
+const today = new Date().toISOString().split('T')[0];
 
 const PersonalSection = ({ form, handleChange, errors = {} }) => {
   const handleImageUpload = (e) => {
@@ -8,14 +12,20 @@ const PersonalSection = ({ form, handleChange, errors = {} }) => {
     if (file) handleChange({ target: { name: 'profileImage', files: [file] } });
   };
 
+  const imageSrc = form.profileImage instanceof File
+    ? URL.createObjectURL(form.profileImage)
+    : form.profileImage
+      ? `http://localhost:5000/${form.profileImage}`
+      : null;
+
   return (
     <>
       {/* Profile Photo */}
       <div className="flex flex-col items-center gap-3">
         <div className="relative">
           <div className="w-24 h-24 rounded-2xl overflow-hidden bg-indigo-50 dark:bg-indigo-900/30 border-2 border-dashed border-indigo-200 dark:border-indigo-700 shadow-sm">
-            {form.profileImage ? (
-              <img src={URL.createObjectURL(form.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+            {imageSrc ? (
+              <img src={imageSrc} alt="Profile" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <User className="w-8 h-8 text-indigo-300 dark:text-indigo-600" />
@@ -34,37 +44,41 @@ const PersonalSection = ({ form, handleChange, errors = {} }) => {
       <div className="space-y-4">
         <SectionDivider label="Personal Info" />
 
-        <Field label="Full Name" required icon={User} error={errors.name}>
-          <input
-            type="text" name="name" placeholder="John Doe"
-            value={form.name || ''} onChange={handleChange}
-            className={`${inputBase} ${errors.name ? 'border-red-400 dark:border-red-500' : ''}`}
-          />
-        </Field>
+        <FormField label="Full Name" required icon={User} error={errors.fullName}>
+  <input
+    type="text" name="fullName" placeholder="John Doe"
+    value={form.fullName || ''} onChange={handleChange}
+    className={`${inputBase} ${errors.fullName ? 'border-red-400 dark:border-red-500' : ''}`}
+  />
+</FormField>
 
-        <Field label="Email Address" required icon={Mail} error={errors.email}>
+        <FormField label="Email Address" required icon={Mail} error={errors.email}>
           <input
             type="email" name="email" placeholder="john@example.com"
             value={form.email || ''} onChange={handleChange}
             className={`${inputBase} ${errors.email ? 'border-red-400 dark:border-red-500' : ''}`}
           />
-        </Field>
+        </FormField>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Phone" required icon={Phone} error={errors.phone}>
+          <FormField label="Phone" required icon={Phone} error={errors.phone}>
             <input
               type="tel" name="phone" placeholder="+91 98765 43210"
               value={form.phone || ''} onChange={handleChange}
               className={`${inputBase} ${errors.phone ? 'border-red-400 dark:border-red-500' : ''}`}
             />
-          </Field>
-          <Field label="Emergency Contact" icon={AlertCircle}>
-            <input type="tel" name="emergencyPhone" placeholder="Emergency number" value={form.emergencyPhone || ''} onChange={handleChange} className={inputBase} />
-          </Field>
+          </FormField>
+          <FormField label="Emergency Contact" icon={AlertCircle}>
+  <input
+    type="tel" name="emergencyContact" placeholder="Emergency number"
+    value={form.emergencyContact || ''} onChange={handleChange}
+    className={inputBase}
+  />
+</FormField>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Gender" required icon={User} error={errors.gender}>
+          <FormField label="Gender" required icon={User} error={errors.gender}>
             <select
               name="gender" value={form.gender || ''} onChange={handleChange}
               className={`${inputBase} appearance-none ${errors.gender ? 'border-red-400 dark:border-red-500' : ''}`}
@@ -74,13 +88,16 @@ const PersonalSection = ({ form, handleChange, errors = {} }) => {
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
-          </Field>
-          <Field label="Date of Birth" required icon={Calendar} error={errors.dob}>
-            <input
-              type="date" name="dob" value={form.dob || ''} onChange={handleChange}
-              className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert ${errors.dob ? 'border-red-400 dark:border-red-500' : ''}`}
-            />
-          </Field>
+          </FormField>
+
+          <FormField label="Date of Birth" required icon={Calendar} error={errors.dateOfBirth}>
+  <input
+    type="date" name="dateOfBirth"
+    value={form.dateOfBirth || ''} onChange={handleChange}
+    max={today}
+    className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert ${errors.dateOfBirth ? 'border-red-400 dark:border-red-500' : ''}`}
+  />
+</FormField>
         </div>
       </div>
     </>

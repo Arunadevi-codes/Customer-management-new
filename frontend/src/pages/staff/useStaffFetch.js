@@ -71,10 +71,12 @@ const useStaffFetch = () => {
     searchTerm, setSearchTerm, handleSearch,
     page, setPage,
     limit, setLimit,
-    total, totalPages,
+    total, setTotal,        // ✅ exposed setTotal for count updates on delete/add
+    totalPages,
     sortField, sortOrder, handleSort,
     fromDate, setFromDate,
     toDate, setToDate,
+    refetch: fetchStaff,    // ✅ exposed for manual re-fetch after mutations
   };
 };
 

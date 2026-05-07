@@ -1,8 +1,9 @@
 import React from "react";
 
-import PageHeader    from "../../components/ui/pageHeader";
+import PageHeader     from "../../components/ui/pageHeader";
 import TableSearchBar from "../../components/ui/tableSearchBar";
 import LoadingSpinner from "../../components/ui/loadingSpinner";
+import TablePagination from "../../components/ui/tablePagination";
 
 import DeleteStaff from "./deleteStaff";
 import StaffPOPup  from "./staffPOPup";
@@ -47,6 +48,13 @@ const Staff = () => {
     toDate,
     setFromDate,
     setToDate,
+
+    // pagination
+    page,
+    setPage,
+    limit,
+    setLimit,
+    totalPages,
   } = useStaff();
 
   return (
@@ -80,15 +88,26 @@ const Staff = () => {
       {loading ? (
         <LoadingSpinner label="Loading staff..." />
       ) : (
-        <StaffTable
-          staffs={staffs}
-          onEdit={handleEditClick}
-          onDelete={handleDeleteClick}
-          onView={handleViewClick}
-          onSort={handleSort}
-          sortField={sortField}
-          sortOrder={sortOrder}
-        />
+        <>
+          <StaffTable
+            staffs={staffs}
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+            onView={handleViewClick}
+            onSort={handleSort}
+            sortField={sortField}
+            sortOrder={sortOrder}
+          />
+
+          {/* PAGINATION */}
+          <TablePagination
+            page={page}
+            totalPages={totalPages}
+            limit={limit}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
+          />
+        </>
       )}
 
       {/* ADD / EDIT FORM MODAL */}

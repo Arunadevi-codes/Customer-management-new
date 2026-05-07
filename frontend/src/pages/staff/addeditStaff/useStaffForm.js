@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import API from "../../../services/api";
+import { validateIFSC } from "./docValidators";
 
 const useStaffForm = (staff) => {
   const isEdit = !!staff;
@@ -15,66 +16,75 @@ const useStaffForm = (staff) => {
   });
 
   const [form, setForm] = useState({
-    name: "",
+    // ── Step 1: Personal ──────────────────────────────────────
+    fullName: "",           
     email: "",
     phone: "",
-    emergencyPhone: "",
+    emergencyContact: "",   
     gender: "",
-    dob: "",
+    dateOfBirth: "",      
     profileImage: null,
-    address: "",
+    // ── Step 1: Address ───────────────────────────────────────
+    addressLine: "",       
     city: "",
     state: "",
     pincode: "",
     country: "",
+    // ── Step 2: Job Info ──────────────────────────────────────
     role: "",
     employeeId: "",
-    joiningDate: "",
+    dateOfJoining: "",     
     status: "active",
+    // ── Step 3: Login ─────────────────────────────────────────
     password: "",
     confirmPassword: "",
+    // ── Step 4: Documents ─────────────────────────────────────
     aadhar: "",
     pan: "",
-    accountNumber: "",
-    ifsc: "",
+    bankAccountNumber: "",  
+    ifscCode: "",           
+    aadharImage: null,
+    panImage: null,
   });
 
-  // PREFILL DATA (EDIT MODE)
+  // ── PREFILL DATA (EDIT MODE) ───────────────────────────────
   useEffect(() => {
     if (staff) {
       setForm({
-        name: staff.fullName || "",
+        fullName: staff.fullName || "",
         email: staff.email || "",
         phone: staff.phone || "",
-        emergencyPhone: staff.emergencyContact || "",
+        emergencyContact: staff.emergencyContact || "",
         gender: staff.gender || "",
-        dob: staff.dateOfBirth ? staff.dateOfBirth.split("T")[0] : "",
-        profileImage: null,
-        address: staff.addressLine || "",
+        dateOfBirth: staff.dateOfBirth ? staff.dateOfBirth.split("T")[0] : "",
+        profileImage: staff.profileImage || null,
+        addressLine: staff.addressLine || "",
         city: staff.city || "",
         state: staff.state || "",
         pincode: staff.pincode || "",
         country: staff.country || "",
         role: staff.role || "staff",
         employeeId: staff.employeeId || "",
-        joiningDate: staff.dateOfJoining ? staff.dateOfJoining.split("T")[0] : "",
+        dateOfJoining: staff.dateOfJoining ? staff.dateOfJoining.split("T")[0] : "",
         status: staff.status || "active",
         password: "",
         confirmPassword: "",
         aadhar: staff.aadhar || "",
         pan: staff.pan || "",
-        accountNumber: staff.bankAccountNumber || "",
-        ifsc: staff.ifscCode || "",
+        bankAccountNumber: staff.bankAccountNumber || "",
+        ifscCode: staff.ifscCode || "",
+        aadharImage: staff.aadharImage || null,
+        panImage: staff.panImage || null,
       });
     }
   }, [staff]);
 
-  // LOAD CITIES IN EDIT MODE
+  // ── LOAD CITIES IN EDIT MODE ──────────────────────────────
   useEffect(() => {
     if (form.state) fetchCities(form.state);
   }, [form.state]);
 
-  // FETCH EMPLOYEE ID (CREATE MODE)
+  // ── FETCH EMPLOYEE ID (CREATE MODE) ──────────────────────
   useEffect(() => {
     if (staff) return;
     const fetchEmployeeId = async () => {
@@ -88,7 +98,7 @@ const useStaffForm = (staff) => {
     fetchEmployeeId();
   }, [staff]);
 
-  // FETCH STATES
+  // ── FETCH STATES ──────────────────────────────────────────
   useEffect(() => {
     const fetchStates = async () => {
       try {
@@ -105,7 +115,7 @@ const useStaffForm = (staff) => {
     fetchStates();
   }, []);
 
-  // FETCH CITIES
+  // ── FETCH CITIES ──────────────────────────────────────────
   const fetchCities = async (stateId) => {
     if (!stateId) { setCities([]); return; }
     try {
@@ -120,64 +130,73 @@ const useStaffForm = (staff) => {
     }
   };
 
-  // HANDLE INPUT
+  // ── HANDLE INPUT ──────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
-      setForm({ ...form, [name]: files[0] });
+      setForm((prev) => ({ ...prev, [name]: files[0] }));
     } else {
-      setForm({ ...form, [name]: value });
+      setForm((prev) => ({ ...prev, [name]: value ?? null }));
     }
   };
 
-  // HANDLE STATE CHANGE
+  // ── HANDLE STATE CHANGE ───────────────────────────────────
   const handleStateChange = (e) => {
     const stateId = e.target.value;
     setForm((prev) => ({ ...prev, state: stateId, city: "" }));
     fetchCities(stateId);
   };
 
-  // VALIDATION PER STEP
-  // Replace validateStep function
-const validateStep = () => {
-  if (step === 1) {
-    const newErrors = {};
-    if (!form.name) newErrors.name = "Full name is required";
-    if (!form.email) newErrors.email = "Email is required";
-    if (!form.phone) newErrors.phone = "Phone is required";
-    if (!form.gender) newErrors.gender = "Gender is required";
-    if (!form.dob) newErrors.dob = "Date of birth is required";
-    if (!form.address) newErrors.address = "Address is required";
-    if (!form.state) newErrors.state = "State is required";
-    if (!form.city) newErrors.city = "City is required";
-    if (!form.country) newErrors.country = "Country is required";
+  // ── VALIDATION PER STEP ───────────────────────────────────
+  const validateStep = () => {
+    if (step === 1) {
+      const newErrors = {};
+      if (!form.fullName)      newErrors.fullName      = "Full name is required";
+      if (!form.email)         newErrors.email         = "Email is required";
+      if (!form.phone)         newErrors.phone         = "Phone is required";
+      if (!form.gender)        newErrors.gender        = "Gender is required";
+      if (!form.dateOfBirth)   newErrors.dateOfBirth   = "Date of birth is required";
+      if (!form.addressLine)   newErrors.addressLine   = "Address is required";
+      if (!form.state)         newErrors.state         = "State is required";
+      if (!form.city)          newErrors.city          = "City is required";
+      if (!form.country)       newErrors.country       = "Country is required";
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return "validation_error"; // sentinel — do NOT toast
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return "validation_error"; // sentinel — do NOT toast
+      }
+      setErrors({});
     }
-    setErrors({});
-  }
 
-  if (step === 2 && (!form.role || !form.joiningDate))
-    return "Fill job details";
-  if (step === 3 && !isEdit) {
-    if (!form.email || !form.password || !form.confirmPassword)
-      return "Fill login credentials";
-    if (form.password !== form.confirmPassword)
-      return "Passwords do not match";
-  }
-  return null;
-};
+    if (step === 2 && (!form.role || !form.dateOfJoining))
+      return "Fill job details";
+
+    if (step === 3 && !isEdit) {
+      if (!form.email || !form.password || !form.confirmPassword)
+        return "Fill login credentials";
+      if (form.password !== form.confirmPassword)
+        return "Passwords do not match";
+    }
+
+    // ── Step 4: block submit if IFSC is filled but invalid ──
+    if (step === 4) {
+      const cleanIFSC = form.ifscCode?.replace(/\s/g, "") || "";
+      if (cleanIFSC && !validateIFSC(cleanIFSC)) {
+        return "Invalid IFSC code — e.g. SBIN0001234";
+      }
+    }
+
+    return null;
+  };
 
   const nextStep = () => {
-  const error = validateStep();
-  if (!error) {
-    setStep((prev) => prev + 1);
-  } else if (error !== "validation_error") {
-    toast.error(error); // only toast for non-step-1 errors
-  }
-};
+    const error = validateStep();
+    if (!error) {
+      setStep((prev) => prev + 1);
+    } else if (error !== "validation_error") {
+      toast.error(error);
+    }
+  };
 
   const prevStep = () => setStep((prev) => prev - 1);
 

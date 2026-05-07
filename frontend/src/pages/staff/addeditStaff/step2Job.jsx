@@ -82,8 +82,8 @@ const Step2Job = ({ form, handleChange }) => {
         <Field label="Joining Date" required icon={Calendar}>
           <input
             type="date"
-            name="joiningDate"
-            value={form.joiningDate || ''}
+            name="dateOfJoining"
+            value={form.dateOfJoining || ''}
             onChange={handleChange}
             className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert`}
           />

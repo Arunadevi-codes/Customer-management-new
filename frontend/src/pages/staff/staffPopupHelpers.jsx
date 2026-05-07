@@ -32,7 +32,7 @@ export const SectionLabel = ({ label }) => (
   </div>
 );
 
-// DETAIL ROW
+// DETAIL ROW — fixed: use nullish check instead of || so "0" and numeric strings display correctly
 export const Detail = ({ icon, label, value }) => (
   <div className="flex items-start gap-3 py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
     <div className="text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0">{icon}</div>
@@ -41,7 +41,7 @@ export const Detail = ({ icon, label, value }) => (
         {label}
       </p>
       <p className="text-sm text-gray-800 dark:text-white mt-0.5 break-words">
-        {value || "—"}
+        {value !== undefined && value !== null && value !== "" ? value : "—"}
       </p>
     </div>
   </div>

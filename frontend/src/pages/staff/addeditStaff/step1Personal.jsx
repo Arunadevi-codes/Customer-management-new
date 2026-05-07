@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, Building2, MapPinned, Globe } from 'lucide-react';
-import { Field, SectionDivider, inputBase } from './formUI';
+import FormField, { inputBase } from '../../../components/ui/formField';
+import SectionDivider from '../../../components/ui/sectionDivider';
 import PersonalSection from './personalSection';
 
 const Step1Personal = ({ form, handleChange, states, cities, loading, handleStateChange, errors = {} }) => {
@@ -14,21 +15,21 @@ const Step1Personal = ({ form, handleChange, states, cities, loading, handleStat
       <div className="space-y-4">
         <SectionDivider label="Address" />
 
-        <Field label="Street Address" required icon={MapPin} error={errors.address}>
-          <textarea
-            name="address"
-            placeholder="Street address, area..."
-            value={form.address || ''}
-            onChange={handleChange}
-            rows={2}
-            className={`${inputBase} resize-none !pt-2.5 ${errors.address ? 'border-red-400 dark:border-red-500' : ''}`}
-            style={{ paddingTop: '0.625rem' }}
-          />
-        </Field>
+        <FormField label="Street Address" required icon={MapPin} error={errors.addressLine}>
+  <textarea
+    name="addressLine"
+    placeholder="Street address, area..."
+    value={form.addressLine || ''}
+    onChange={handleChange}
+    rows={2}
+    className={`${inputBase} resize-none !pt-2.5 ${errors.addressLine ? 'border-red-400 dark:border-red-500' : ''}`}
+    style={{ paddingTop: '0.625rem' }}
+  />
+</FormField>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* STATE */}
-          <Field label="State" required icon={MapPinned} error={errors.state}>
+          <FormField label="State" required icon={MapPinned} error={errors.state}>
             <select
               value={form.state || ""}
               onChange={handleStateChange}
@@ -42,10 +43,10 @@ const Step1Personal = ({ form, handleChange, states, cities, loading, handleStat
                 <option key={s._id || s.id} value={s._id || s.id}>{s.name}</option>
               ))}
             </select>
-          </Field>
+          </FormField>
 
           {/* CITY */}
-          <Field label="City" required icon={Building2} error={errors.city}>
+          <FormField label="City" required icon={Building2} error={errors.city}>
             <select
               name="city"
               value={form.city || ""}
@@ -60,20 +61,20 @@ const Step1Personal = ({ form, handleChange, states, cities, loading, handleStat
                 <option key={c._id || c.id} value={c._id || c.id}>{c.name}</option>
               ))}
             </select>
-          </Field>
+          </FormField>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Pincode" icon={MapPin}>
+          <FormField label="Pincode" icon={MapPin}>
             <input type="text" name="pincode" placeholder="Pincode / ZIP" value={form.pincode || ''} onChange={handleChange} className={inputBase} />
-          </Field>
-          <Field label="Country" required icon={Globe} error={errors.country}>
+          </FormField>
+          <FormField label="Country" required icon={Globe} error={errors.country}>
             <input
               type="text" name="country" placeholder="Country"
               value={form.country || ''} onChange={handleChange}
               className={`${inputBase} ${errors.country ? 'border-red-400 dark:border-red-500' : ''}`}
             />
-          </Field>
+          </FormField>
         </div>
       </div>
 

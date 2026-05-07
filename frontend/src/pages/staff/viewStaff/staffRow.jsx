@@ -1,28 +1,32 @@
-// staffRow.jsx
-
-import React from "react";
+import React, { useState } from "react";
 import { Edit, Trash2, Eye } from "lucide-react";
 
-const StaffRow = ({
-  staff,
-  onEdit,
-  onDelete,
-  onView
-}) => {
+const StaffRow = ({ staff, onEdit, onDelete, onView }) => {
+  const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 });
+
+  const handleMouseEnter = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip({
+      visible: true,
+      x: rect.left,
+      y: rect.bottom + window.scrollY + 6,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip({ visible: false, x: 0, y: 0 });
+  };
 
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 border-b border-gray-100 dark:border-gray-700 divide-x divide-gray-100 dark:divide-gray-700">
 
       {/* NAME */}
       <td className="px-3 sm:px-4 py-2 sm:py-3">
-
         <div className="flex items-center gap-2 sm:gap-3">
-
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border shadow-sm flex-shrink-0">
-
             {staff.profileImage ? (
               <img
-                src={`http://localhost:5000/uploads/staff/${staff.profileImage}`}
+                src={`http://localhost:5000/${staff.profileImage}`}
                 alt={staff.fullName}
                 className="w-full h-full object-cover"
               />
@@ -31,53 +35,46 @@ const StaffRow = ({
                 {staff.fullName?.charAt(0)?.toUpperCase() || "S"}
               </span>
             )}
-
           </div>
-
           <div
             className="truncate max-w-[120px] sm:max-w-[150px] text-xs sm:text-sm font-medium text-gray-800 dark:text-white"
             title={staff.fullName}
           >
             {staff.fullName}
           </div>
-
         </div>
       </td>
 
       {/* PHONE */}
       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-
-        <div
-          className="truncate max-w-[120px]"
-          title={staff.phone}
-        >
+        <div className="truncate max-w-[120px]" title={staff.phone}>
           {staff.phone || "—"}
         </div>
-
       </td>
 
       {/* EMAIL */}
-      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300 relative group">
-
-        <div className="truncate max-w-[200px]">
+      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+        <div
+          className="truncate max-w-[200px] cursor-default"
+          onMouseEnter={staff.email ? handleMouseEnter : undefined}
+          onMouseLeave={staff.email ? handleMouseLeave : undefined}
+        >
           {staff.email || "—"}
         </div>
 
-        {staff.email && (
-          <div className="absolute left-0 top-full mt-1 hidden group-hover:block z-50 bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg p-2 shadow-lg w-max max-w-[250px]">
-
-            <div className="break-all">
-              {staff.email}
-            </div>
-
+        {/* ✅ Fixed-position tooltip — escapes overflow:hidden/auto entirely */}
+        {tooltip.visible && staff.email && (
+          <div
+            className="fixed z-[9999] bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg px-3 py-2 shadow-lg max-w-[280px] break-all pointer-events-none"
+            style={{ top: tooltip.y, left: tooltip.x }}
+          >
+            {staff.email}
           </div>
         )}
-
       </td>
 
       {/* STATUS */}
       <td className="px-3 sm:px-4 py-2 sm:py-3 text-center">
-
         <span
           className={`px-2 py-1 rounded-full text-[10px] sm:text-xs font-medium ${
             staff.status === "active"
@@ -87,28 +84,20 @@ const StaffRow = ({
         >
           {staff.status || "inactive"}
         </span>
-
       </td>
 
       {/* CREATED */}
       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-
-        <div
-          className="truncate max-w-[120px]"
-          title={staff.createdAt}
-        >
+        <div className="truncate max-w-[120px]" title={staff.createdAt}>
           {staff.createdAt
             ? new Date(staff.createdAt).toLocaleDateString("en-IN")
             : "—"}
         </div>
-
       </td>
 
       {/* ACTIONS */}
       <td className="px-3 sm:px-4 py-2 sm:py-3">
-
         <div className="flex gap-1.5 sm:gap-2">
-
           <button
             onClick={() => onView(staff)}
             className="p-1.5 sm:p-1 text-green-600 hover:bg-green-50 dark:hover:bg-gray-800 rounded-lg transition"
@@ -116,7 +105,6 @@ const StaffRow = ({
           >
             <Eye size={16} />
           </button>
-
           <button
             onClick={() => onEdit(staff)}
             className="p-1.5 sm:p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition"
@@ -124,7 +112,6 @@ const StaffRow = ({
           >
             <Edit size={16} />
           </button>
-
           <button
             onClick={() => onDelete(staff._id)}
             className="p-1.5 sm:p-1 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 rounded-lg transition"
@@ -132,7 +119,6 @@ const StaffRow = ({
           >
             <Trash2 size={16} />
           </button>
-
         </div>
       </td>
 

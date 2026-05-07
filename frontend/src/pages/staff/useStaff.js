@@ -23,10 +23,12 @@ export const useStaff = () => {
     try {
       await API.delete(`/staff/${selectedStaffId}`);
       fetch.setStaffs((prev) => prev.filter((s) => s._id !== selectedStaffId));
+      fetch.setTotal((prev) => prev - 1);
       toast.success("Staff deleted successfully");
       setIsDeleteModalOpen(false);
       setSelectedStaffId(null);
     } catch (err) {
+      console.error("Delete error:", err.response?.status, err.response?.data);
       toast.error("Delete failed");
     }
   };
@@ -45,6 +47,8 @@ export const useStaff = () => {
           ? prev.map((s) => (s._id === id ? { ...s, ...savedStaff } : s))
           : [savedStaff, ...prev]
       );
+
+      if (!id) fetch.setTotal((prev) => prev + 1);
 
       toast.success(id ? "Staff updated" : "Staff added");
       setIsModalOpen(false);

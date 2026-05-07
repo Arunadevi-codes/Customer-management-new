@@ -5,13 +5,13 @@ import {
   Briefcase, IdCard, Activity, AlertCircle,
   CreditCard, Building2, FileText, Globe,
 } from "lucide-react";
-import { getStateName, getCityName, formatDate, SectionLabel, Detail } from "./staffPOPup1";
+import { getStateName, getCityName, formatDate, SectionLabel, Detail } from "./staffPopupHelpers";
 
 const StaffPOPup = ({ staff, onClose }) => {
   if (!staff) return null;
 
   const imageUrl = staff.profileImage
-    ? `http://localhost:5000/uploads/staff/${staff.profileImage}`
+    ? `http://localhost:5000/${staff.profileImage}`
     : null;
 
   const roleLabel = staff.role

@@ -33,14 +33,18 @@ const staffSchema = new mongoose.Schema(
     },
 
     // STEP 4 - LOGIN
-    loginEmail: { type: String},
-    password: { type: String, required: true, select: false}, // hashed later
+    loginEmail: { type: String },
+    password: { type: String, required: true, select: false }, // hashed later
 
     // DOCUMENTS
     aadhar: { type: String },
     pan: { type: String },
     bankAccountNumber: { type: String },
     ifscCode: { type: String },
+
+    // DOCUMENT IMAGES  ← new
+    aadharImage: { type: String, default: null }, // stored filename / URL
+    panImage: { type: String, default: null },    // stored filename / URL
   },
   { timestamps: true }
 );
