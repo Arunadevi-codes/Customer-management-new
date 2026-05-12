@@ -36,6 +36,7 @@ const useStaffForm = (staff) => {
     dateOfJoining: "",     
     status: "active",
     // ── Step 3: Login ─────────────────────────────────────────
+    loginEmail: "",
     password: "",
     confirmPassword: "",
     // ── Step 4: Documents ─────────────────────────────────────
@@ -67,6 +68,7 @@ const useStaffForm = (staff) => {
         employeeId: staff.employeeId || "",
         dateOfJoining: staff.dateOfJoining ? staff.dateOfJoining.split("T")[0] : "",
         status: staff.status || "active",
+        loginEmail: staff.loginEmail || "",
         password: "",
         confirmPassword: "",
         aadhar: staff.aadhar || "",
@@ -173,7 +175,7 @@ const handleChange = (e) => {
       return "Fill job details";
 
     if (step === 3 && !isEdit) {
-      if (!form.email || !form.password || !form.confirmPassword)
+      if (!form.loginEmail || !form.password || !form.confirmPassword)
         return "Fill login credentials";
       if (form.password !== form.confirmPassword)
         return "Passwords do not match";

@@ -20,7 +20,8 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
     state: customer?.state || '',
     city: customer?.city || '',
     pincode: customer?.pincode || '',
-    image: null
+    image: null,
+    removeImage: false
   });
 
   const [preview, setPreview] = useState(
@@ -168,7 +169,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 [&::-webkit-scrollbar]:hidden">
           <div className="p-5 space-y-5">
 
-            <CustomerImageUpload preview={preview} handleFileChange={handleFileChange} />
+            <CustomerImageUpload preview={preview} handleFileChange={handleFileChange} setPreview={setPreview} setFormData={setFormData} />
 
             <CustomerBasicFields formData={formData} handleInputChange={handleInputChange} />
 

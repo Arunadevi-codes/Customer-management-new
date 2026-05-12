@@ -91,27 +91,92 @@ exports.getCustomerById = async (req, res) => {
 };
 
 //  UPDATE
-
 exports.updateCustomer = async (req, res) => {
   try {
-    const { name, email, phone, street, state, city, pincode } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      street,
+      state,
+      city,
+      pincode,
+      removeImage
+    } = req.body;
 
-    const updateData = { name, email, phone, street, state, city, pincode };
+    // Find existing customer
+    const customer = await Customer.findById(req.params.id);
 
+    if (!customer) {
+      return res.status(404).json({
+        message: "Customer not found"
+      });
+    }
+
+    const updateData = {
+      name,
+      email,
+      phone,
+      street,
+      state,
+      city,
+      pincode
+    };
+
+    // REMOVE EXISTING IMAGE
+    if (removeImage === "true" && customer.image) {
+
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "uploads",
+        customer.image
+      );
+
+      // Delete image from uploads folder
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+
+      // Remove image from DB
+      updateData.image = null;
+    }
+
+    // UPLOAD NEW IMAGE
     if (req.file) {
+
+      // Delete old image if exists
+      if (customer.image) {
+
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          "uploads",
+          customer.image
+        );
+
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
       updateData.image = req.file.filename;
     }
 
+    // UPDATE CUSTOMER
     const updated = await Customer.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true }
+      { returnDocument: "after" }
     );
 
     res.json(updated);
 
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({
+      message: "Failed to update customer",
+      error: err.message
+    });
   }
 };
 

@@ -92,9 +92,9 @@ const Step3Login = ({ form, handleChange, isEdit }) => {
       >
         <input
           type="email"
-          name="email"
+          name="loginEmail"
           placeholder="staff@company.com"
-          value={form.email || ''}
+          value={form.loginEmail || ''}
           onChange={handleChange}
           className={inputBase}
         />

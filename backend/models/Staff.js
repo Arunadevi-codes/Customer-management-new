@@ -42,9 +42,9 @@ const staffSchema = new mongoose.Schema(
     bankAccountNumber: { type: String },
     ifscCode: { type: String },
 
-    // DOCUMENT IMAGES  ← new
-    aadharImage: { type: String, default: null }, // stored filename / URL
-    panImage: { type: String, default: null },    // stored filename / URL
+    // DOCUMENT IMAGES  
+    aadharImage: { type: String, default: null }, 
+    panImage: { type: String, default: null },    
   },
   { timestamps: true }
 );

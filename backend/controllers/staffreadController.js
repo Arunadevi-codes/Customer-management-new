@@ -1,42 +1,34 @@
 const Staff = require("../models/Staff");
 
-const { generateEmployeeId }            = require("../helpers/staffHelper");
+const { previewNextEmployeeId } = require("../helpers/staffHelper");
 const { buildSearchQuery, buildDateQuery, getPagination, getSortOptions } = require("../helpers/queryHelper");
 
-//  GET NEXT EMPLOYEE ID
-
+// ── GET NEXT EMPLOYEE ID (preview only — does NOT increment) ───
 exports.getNextEmployeeId = async (req, res) => {
   try {
-    const employeeId = await generateEmployeeId();
+    const employeeId = await previewNextEmployeeId();
     res.json({ employeeId });
-
   } catch (err) {
     console.error("getNextEmployeeId error:", err);
     res.status(500).json({ message: err.message, stack: err.stack });
   }
 };
 
-//  GET ALL  (with search / date filter / sort / pagination)
-
+// ── GET ALL (with search / date filter / sort / pagination) ────
 exports.getStaff = async (req, res) => {
   try {
-    // ── Pagination ──────────────────────────
     const { limit, skip } = getPagination(req.query);
 
-    // ── Filters ─────────────────────────────
     const searchQuery = buildSearchQuery(req.query.search, ["fullName", "email", "phone"]);
     const dateQuery   = buildDateQuery(req.query.fromDate, req.query.toDate);
+    const query       = { ...searchQuery, ...dateQuery };
 
-    const query = { ...searchQuery, ...dateQuery };
-
-    // ── Sort ────────────────────────────────
     const { sortField, sortOrder, needsCollation } = getSortOptions(
       req.query,
       "createdAt",
-      ["fullName", "email", "phone"]   // fields that need locale-aware collation
+      ["fullName", "email", "phone"]
     );
 
-    // ── Query ───────────────────────────────
     const queryBuilder = Staff.find(query)
       .select("-password")
       .sort({ [sortField]: sortOrder })
@@ -51,16 +43,12 @@ exports.getStaff = async (req, res) => {
     const total  = await Staff.countDocuments(query);
 
     res.json({ staffs, total });
-
   } catch (err) {
-    res.status(500).json({
-      message: err.message || "Failed to fetch staff",
-    });
+    res.status(500).json({ message: err.message || "Failed to fetch staff" });
   }
 };
 
-//  GET ONE
-
+// ── GET ONE ────────────────────────────────────────────────────
 exports.getStaffById = async (req, res) => {
   try {
     const staff = await Staff.findById(req.params.id);
@@ -73,10 +61,7 @@ exports.getStaffById = async (req, res) => {
     delete safeStaff.password;
 
     res.json(safeStaff);
-
   } catch (err) {
-    res.status(500).json({
-      message: err.message || "Failed to fetch staff details",
-    });
+    res.status(500).json({ message: err.message || "Failed to fetch staff details" });
   }
 };
