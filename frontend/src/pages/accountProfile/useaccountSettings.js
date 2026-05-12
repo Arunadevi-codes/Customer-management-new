@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../contexts/authContext";
-import { getMyProfile, updateMyProfile, changeMyPassword } from "../services/staffApi";
-import API from "../services/api";
+import { useAuth } from "../../contexts/authContext";
+import { getMyProfile, updateMyProfile, changeMyPassword } from "../../services/staffApi";
+import API from "../../services/api";
 import { toast } from "react-toastify";
 
 const useAccountSettings = () => {
@@ -24,16 +24,18 @@ const useAccountSettings = () => {
     aadhar: "", pan: "", bankAccountNumber: "", ifscCode: "",
   });
 
-  const [previewImg, setPreviewImg] = useState(null);
-  const [newImageFile, setNewImageFile] = useState(null);
+  const [previewImg, setPreviewImg]       = useState(null);   // object URL for local preview
+  const [newImageFile, setNewImageFile]   = useState(null);   // File object to upload
+  // ✅ true when user explicitly clicks X to remove the current profile image
+  const [removeImage, setRemoveImage]     = useState(false);
 
-  const [pwdForm, setPwdForm] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [pwdForm, setPwdForm]   = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [pwdSaving, setPwdSaving] = useState(false);
 
-  // Fetch profile
+  // ── Fetch profile ──────────────────────────────────────────
   useEffect(() => { fetchProfile(); }, []);
 
-  // Fetch states
+  // ── Fetch states ───────────────────────────────────────────
   useEffect(() => {
     const fetchStates = async () => {
       try {
@@ -46,7 +48,7 @@ const useAccountSettings = () => {
     fetchStates();
   }, []);
 
-  // Fetch cities when state changes
+  // ── Fetch cities when state changes ───────────────────────
   useEffect(() => {
     if (!form.state) { setCities([]); return; }
     const fetchCities = async () => {
@@ -81,21 +83,31 @@ const useAccountSettings = () => {
     finally { setLoading(false); }
   };
 
-  const handleField = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-
-  const handleStateChange = (e) => setForm((prev) => ({ ...prev, state: e.target.value, city: "" }));
+  const handleField        = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleStateChange  = (e) => setForm((prev) => ({ ...prev, state: e.target.value, city: "" }));
 
   const handleImagePick = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setNewImageFile(file);
     setPreviewImg(URL.createObjectURL(file));
+    setRemoveImage(false); // picking a new image cancels any pending removal
+  };
+
+  // ✅ X button handler — clears preview/file and flags removal
+  const handleRemoveImage = () => {
+    setPreviewImg(null);
+    setNewImageFile(null);
+    setRemoveImage(true);
+    // Reset the file input so the same file can be re-selected if needed
+    if (fileRef.current) fileRef.current.value = "";
   };
 
   const cancelEdit = () => {
     setEditing(false);
     setPreviewImg(null);
     setNewImageFile(null);
+    setRemoveImage(false);
     fetchProfile();
   };
 
@@ -104,16 +116,32 @@ const useAccountSettings = () => {
       setSaving(true);
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => { fd.append(k, v); });
-      if (newImageFile) fd.append("profileImage", newImageFile);
+
+      if (newImageFile) {
+        fd.append("profileImage", newImageFile);
+      } else if (removeImage) {
+        // ✅ Tell the backend to delete and nullify the current image
+        fd.append("removeProfileImage", "true");
+      }
+
       const res = await updateMyProfile(fd);
+
       login(
-        { ...user, name: res.staff.fullName, profileImage: res.staff.profileImage?.replace(/\\/g, "/") },
+        {
+          ...user,
+          name: res.staff.fullName,
+          profileImage: res.staff.profileImage
+            ? res.staff.profileImage.replace(/\\/g, "/")
+            : null,
+        },
         localStorage.getItem("token")
       );
+
       setProfile(res.staff);
       setEditing(false);
       setPreviewImg(null);
       setNewImageFile(null);
+      setRemoveImage(false);
       toast.success("Profile updated successfully");
     } catch (err) { toast.error(err.message || "Update failed"); }
     finally { setSaving(false); }
@@ -136,15 +164,20 @@ const useAccountSettings = () => {
   const getInitials = (name = "") =>
     name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
+  // ✅ If removeImage is flagged (and no new file chosen), show no avatar
   const avatarSrc =
     previewImg ||
-    (profile?.profileImage ? `http://localhost:5000/${profile.profileImage.replace(/\\/g, "/")}` : null);
+    (removeImage
+      ? null
+      : profile?.profileImage
+        ? `http://localhost:5000/${profile.profileImage.replace(/\\/g, "/")}`
+        : null);
 
   return {
     fileRef, profile, loading, editing, setEditing, saving,
     states, cities, locationLoading,
     form, handleField, handleStateChange,
-    previewImg, handleImagePick, cancelEdit, handleSave,
+    previewImg, removeImage, handleImagePick, handleRemoveImage, cancelEdit, handleSave,
     pwdForm, setPwdForm, pwdSaving, handlePasswordChange,
     getInitials, avatarSrc,
   };

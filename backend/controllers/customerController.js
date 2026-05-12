@@ -53,13 +53,17 @@ exports.getCustomers = async (req, res) => {
     // ── Sort ────────────────────────────────
     const { sortField, sortOrder } = getSortOptions(
       req.query,
-      "createdAt",
-      ["name", "email", "phone"]   // fields that need locale-aware collation
+      null,
+      ["name", "email", "phone"]
     );
+
+    // ✅ Default: newest first when no sort is specified
+    const appliedSortField = sortField || "createdAt";
+    const appliedSortOrder = sortField ? sortOrder : -1;
 
     // ── Query ───────────────────────────────
     const customers = await Customer.find(query)
-      .sort({ [sortField]: sortOrder })
+      .sort({ [appliedSortField]: appliedSortOrder })
       .collation({ locale: "en", strength: 2 })
       .skip(skip)
       .limit(limit);

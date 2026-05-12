@@ -1,5 +1,16 @@
 const Staff  = require("../models/Staff");
 const bcrypt = require("bcryptjs");
+const fs     = require("fs");
+const path   = require("path");
+
+// ── Helper: safely delete a file from disk ─────────────────────
+const deleteFile = (storedPath) => {
+  if (!storedPath) return;
+  const abs = path.resolve(storedPath.replace(/\\/g, "/"));
+  fs.unlink(abs, (err) => {
+    if (err) console.warn("Could not delete file:", abs, err.message);
+  });
+};
 
 // GET /api/staff/profile/me
 exports.getMyProfile = async (req, res) => {
@@ -16,34 +27,31 @@ exports.getMyProfile = async (req, res) => {
 exports.updateMyProfile = async (req, res) => {
   try {
     const allowed = [
-  "fullName",
-  "phone",
-  "emergencyContact",
-  "gender",
-  "dateOfBirth",
+      "fullName", "phone", "emergencyContact", "gender", "dateOfBirth",
+      "addressLine", "city", "state", "pincode", "country",
+      "dateOfJoining",
+      "aadhar", "pan", "bankAccountNumber", "ifscCode",
+      "loginEmail",
+    ];
 
-  "addressLine",
-  "city",
-  "state",
-  "pincode",
-  "country",
-
-  "dateOfJoining",
-
-  "aadhar",
-  "pan",
-  "bankAccountNumber",
-  "ifscCode",
-
-  "loginEmail"
-];
     const updates = {};
     allowed.forEach((key) => {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
     });
 
+    // Fetch current staff so we can delete old image from disk if needed
+    const existing = await Staff.findById(req.user.id);
+    if (!existing) return res.status(404).json({ message: "Staff not found" });
+
+    // ✅ Remove profile image explicitly (user clicked the X button)
+    if (req.body.removeProfileImage === "true" && !req.files?.profileImage?.[0]) {
+      deleteFile(existing.profileImage);
+      updates.profileImage = null;
+    }
+
+    // ✅ Upload new profile image (delete old one first if it exists)
     if (req.files?.profileImage?.[0]) {
-      // multer stores to uploads/staff — path will be e.g. "uploads/staff/1234-photo.jpg"
+      deleteFile(existing.profileImage);
       updates.profileImage = req.files.profileImage[0].path.replace(/\\/g, "/");
     }
 
@@ -53,7 +61,6 @@ exports.updateMyProfile = async (req, res) => {
       { new: true, runValidators: true }
     ).select("-password");
 
-    if (!staff) return res.status(404).json({ message: "Staff not found" });
     res.json({ staff });
   } catch (err) {
     res.status(500).json({ message: err.message });

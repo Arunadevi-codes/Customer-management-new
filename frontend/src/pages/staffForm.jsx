@@ -37,10 +37,10 @@ const StaffForm = () => {
 
       if (res.data.token) {
         const userData = {
-          name:         res.data.user?.name,
-          email:        res.data.user?.email,
-          role:         res.data.user?.role,
-          employeeId:   res.data.user?.employeeId,
+          name: res.data.user?.name,
+          email: res.data.user?.email,
+          role: res.data.user?.role,
+          employeeId: res.data.user?.employeeId,
           profileImage: res.data.user?.profileImage,
         };
 

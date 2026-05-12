@@ -1,5 +1,5 @@
-import React from "react";
-import { Camera } from "lucide-react";
+import React, { useState } from "react";
+import { Camera, X } from "lucide-react";
 import { PwdInput } from "./accountSettingsUI";
 import { PersonalSection, JobSection, DocumentsSection } from "./accountsettingsSection";
 import useAccountSettings from "./useaccountSettings";
@@ -9,10 +9,46 @@ const AccountSettings = () => {
     fileRef, profile, loading, editing, setEditing, saving,
     states, cities, locationLoading,
     form, handleField, handleStateChange,
-    handleImagePick, cancelEdit, handleSave,
+    handleImagePick, handleRemoveImage, cancelEdit, handleSave,
     pwdForm, setPwdForm, pwdSaving, handlePasswordChange,
     getInitials, avatarSrc,
   } = useAccountSettings();
+
+  // ── Inline password validation errors (no toast, no icon) ──
+  const [pwdErrors, setPwdErrors] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const handlePwdChange = () => {
+    const { currentPassword, newPassword, confirmPassword } = pwdForm;
+
+    const errors = {
+      currentPassword: !currentPassword ? "Current password is required" : "",
+      newPassword: !newPassword
+        ? "New password is required"
+        : newPassword.length < 6
+        ? "Password must be at least 6 characters"
+        : "",
+      confirmPassword: !confirmPassword
+        ? "Please confirm your new password"
+        : confirmPassword !== newPassword
+        ? "Passwords do not match"
+        : "",
+    };
+
+    setPwdErrors(errors);
+    if (Object.values(errors).some(Boolean)) return;
+
+    setPwdErrors({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    handlePasswordChange();
+  };
+
+  const handlePwdFieldChange = (field) => (e) => {
+    setPwdErrors((prev) => ({ ...prev, [field]: "" }));
+    setPwdForm((f) => ({ ...f, [field]: e.target.value }));
+  };
 
   if (loading) {
     return (
@@ -29,10 +65,13 @@ const AccountSettings = () => {
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage your staff profile and password</p>
       </div>
 
+      {/* ── Profile Card ── */}
       <div className="bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm p-4 sm:p-6 md:p-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-8">
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+
+            {/* ── Avatar ── */}
             <div className="relative mx-auto sm:mx-0">
               <div className="w-24 h-24 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shadow-sm border border-gray-200 dark:border-gray-700">
                 {avatarSrc
@@ -40,16 +79,42 @@ const AccountSettings = () => {
                   : <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-300">{getInitials(profile?.fullName)}</span>
                 }
               </div>
+
               {editing && (
                 <>
-                  <button type="button" onClick={() => fileRef.current?.click()}
-                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 flex items-center justify-center shadow-lg transition">
+                  {/* Camera — pick / change image */}
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-orange-500 hover:bg-orange-600 flex items-center justify-center shadow-lg transition"
+                    title="Change photo"
+                  >
                     <Camera className="w-4 h-4 text-white" />
                   </button>
-                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
+
+                  {/* ✅ X — remove current image (only when an image is shown) */}
+                  {avatarSrc && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center shadow transition"
+                      title="Remove photo"
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  )}
+
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImagePick}
+                  />
                 </>
               )}
             </div>
+
             <div className="text-center sm:text-left">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{profile?.fullName}</h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">{profile?.email}</p>
@@ -85,17 +150,41 @@ const AccountSettings = () => {
         <DocumentsSection form={form} profile={profile} handleField={handleField} editing={editing} />
       </div>
 
+      {/* ── Password Card ── */}
       <div className="bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm p-4 sm:p-6 md:p-8">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Password Settings</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          <PwdInput id="currentPassword" label="Current Password" value={pwdForm.currentPassword}
-            onChange={(e) => setPwdForm((f) => ({ ...f, currentPassword: e.target.value }))} placeholder="Enter current password" />
-          <PwdInput id="newPassword" label="New Password" value={pwdForm.newPassword}
-            onChange={(e) => setPwdForm((f) => ({ ...f, newPassword: e.target.value }))} placeholder="Enter new password" />
-          <PwdInput id="confirmPassword" label="Confirm Password" value={pwdForm.confirmPassword}
-            onChange={(e) => setPwdForm((f) => ({ ...f, confirmPassword: e.target.value }))} placeholder="Confirm new password" />
+
+          <div className="flex flex-col gap-1">
+            <PwdInput id="currentPassword" label="Current Password"
+              value={pwdForm.currentPassword} onChange={handlePwdFieldChange("currentPassword")}
+              placeholder="Enter current password" />
+            {pwdErrors.currentPassword && (
+              <p className="text-xs text-red-500 dark:text-red-400 mt-0.5 pl-0.5">{pwdErrors.currentPassword}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <PwdInput id="newPassword" label="New Password"
+              value={pwdForm.newPassword} onChange={handlePwdFieldChange("newPassword")}
+              placeholder="Enter new password" />
+            {pwdErrors.newPassword && (
+              <p className="text-xs text-red-500 dark:text-red-400 mt-0.5 pl-0.5">{pwdErrors.newPassword}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <PwdInput id="confirmPassword" label="Confirm Password"
+              value={pwdForm.confirmPassword} onChange={handlePwdFieldChange("confirmPassword")}
+              placeholder="Confirm new password" />
+            {pwdErrors.confirmPassword && (
+              <p className="text-xs text-red-500 dark:text-red-400 mt-0.5 pl-0.5">{pwdErrors.confirmPassword}</p>
+            )}
+          </div>
+
         </div>
-        <button onClick={handlePasswordChange} disabled={pwdSaving}
+
+        <button onClick={handlePwdChange} disabled={pwdSaving}
           className="mt-6 px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white text-sm font-semibold transition">
           {pwdSaving ? "Changing..." : "Change Password"}
         </button>

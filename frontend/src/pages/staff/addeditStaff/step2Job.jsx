@@ -20,7 +20,16 @@ const Field = ({ label, required, icon: Icon, children, hint }) => (
   </div>
 );
 
-const Step2Job = ({ form, handleChange }) => {
+// Inline error message component
+const InlineError = ({ message }) =>
+  message ? (
+    <p className="mt-1 text-xs text-red-500 dark:text-red-400 flex items-center gap-1 font-medium">
+      {/* <XCircle className="w-3 h-3 shrink-0" /> */}
+      {message}
+    </p>
+  ) : null;
+
+const Step2Job = ({ form, handleChange, errors = {} }) => {
   return (
     <div className="w-full max-w-lg mx-auto px-1 py-4 space-y-6">
 
@@ -35,19 +44,22 @@ const Step2Job = ({ form, handleChange }) => {
       </div>
 
       {/* Role */}
-      <Field label="Role" required icon={UserCog}>
-        <select
-          name="role"
-          value={form.role || ''}
-          onChange={handleChange}
-          className={`${inputBase} appearance-none`}
-        >
-          <option value="">Select role</option>
-          <option value="staff">Staff</option>
-          <option value="manager">Manager</option>
-          <option value="admin">Admin</option>
-        </select>
-      </Field>
+      <div>
+        <Field label="Role" required icon={UserCog}>
+          <select
+            name="role"
+            value={form.role || ''}
+            onChange={handleChange}
+            className={`${inputBase} appearance-none ${errors.role ? 'border-red-400 dark:border-red-500 focus:ring-red-400' : ''}`}
+          >
+            <option value="">Select role</option>
+            <option value="staff">Staff</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin</option>
+          </select>
+        </Field>
+        <InlineError message={errors.role} />
+      </div>
 
       {/* Employee ID — auto-generated badge style */}
       <div>
@@ -79,28 +91,34 @@ const Step2Job = ({ form, handleChange }) => {
 
       {/* Joining Date + Status */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Joining Date" required icon={Calendar}>
-          <input
-            type="date"
-            name="dateOfJoining"
-            value={form.dateOfJoining || ''}
-            onChange={handleChange}
-            className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert`}
-          />
-        </Field>
+        <div>
+          <Field label="Joining Date" required icon={Calendar}>
+            <input
+              type="date"
+              name="dateOfJoining"
+              value={form.dateOfJoining || ''}
+              onChange={handleChange}
+              className={`${inputBase} [&::-webkit-calendar-picker-indicator]:dark:invert ${errors.dateOfJoining ? 'border-red-400 dark:border-red-500 focus:ring-red-400' : ''}`}
+            />
+          </Field>
+          <InlineError message={errors.dateOfJoining} />
+        </div>
 
-        <Field label="Status" required icon={Activity}>
-          <select
-            name="status"
-            value={form.status || ''}
-            onChange={handleChange}
-            className={`${inputBase} appearance-none`}
-          >
-            <option value="">Select status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </Field>
+        <div>
+          <Field label="Status" required icon={Activity}>
+            <select
+              name="status"
+              value={form.status || ''}
+              onChange={handleChange}
+              className={`${inputBase} appearance-none ${errors.status ? 'border-red-400 dark:border-red-500 focus:ring-red-400' : ''}`}
+            >
+              <option value="">Select status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </Field>
+          <InlineError message={errors.status} />
+        </div>
       </div>
 
       {/* Status indicator pill */}

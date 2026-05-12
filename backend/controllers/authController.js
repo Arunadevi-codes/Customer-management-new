@@ -31,7 +31,7 @@ exports.adminLogin = async (req, res) => {
       user: {
         name:     admin.username,
         username: admin.username,
-        role:     "superadmin", // ✅ role in response only
+        role:     "superadmin",
       },
     });
   } catch (err) {
@@ -47,7 +47,8 @@ exports.staffLogin = async (req, res) => {
     if (!email || !password)
       return res.status(400).json({ message: "All fields are required" });
 
-    const staff = await Staff.findOne({ email }).select("+password");
+    // ✅ Authenticate using loginEmail (credential email), not personal email
+    const staff = await Staff.findOne({ loginEmail: email }).select("+password");
 
     if (!staff)
       return res.status(401).json({ message: "Invalid credentials" });
@@ -69,10 +70,10 @@ exports.staffLogin = async (req, res) => {
       message: "Login successful",
       token,
       user: {
-        name:         staff.fullName,
-        email:        staff.email,
-        role:         staff.role, // ✅ role from DB in response only
-        employeeId:   staff.employeeId,
+        name: staff.fullName,
+        email: staff.loginEmail,   
+        role: staff.role,
+        employeeId: staff.employeeId,
         profileImage: staff.profileImage,
       },
     });

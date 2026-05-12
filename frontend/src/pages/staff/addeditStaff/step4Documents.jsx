@@ -12,26 +12,14 @@ import {
 const validBorder = (ok) =>
   ok ? 'border-emerald-400 dark:border-emerald-600' : 'border-red-400 dark:border-red-600';
 
-const IdField = ({ label, icon, show, onToggle, inputProps, isValid, validation, uploadName, uploadValue, onChange }) => (
-  <DocField label={label} required icon={icon}>
-    <div className="flex items-center gap-1.5">
-      <input {...inputProps} type={show ? 'text' : 'password'}
-        className={`${docInputBase} ${isValid !== undefined ? validBorder(isValid) : ''}`} />
-      <EyeToggle show={show} onToggle={onToggle} />
-    </div>
-    {validation && <DocValidationHint valid={validation.valid} message={validation.message} />}
-    <DocImageUpload label={label} name={uploadName} value={uploadValue} onChange={onChange} />
-  </DocField>
-);
-
-const Step4Documents = ({ form, handleChange }) => {
+const Step4Documents = ({ form, handleChange, errors = {} }) => {
   const [showAadhar,  setShowAadhar]  = useState(false);
   const [showPAN,     setShowPAN]     = useState(false);
   const [showAccount, setShowAccount] = useState(false);
 
-  const cleanAadhar = form.aadhar?.replace(/\D/g, '')          || '';
-  const cleanPAN    = form.pan?.replace(/\s/g, '')              || '';
-  const cleanIFSC   = form.ifscCode?.replace(/\s/g, '')         || ''; // ← was form.ifsc
+  const cleanAadhar = form.aadhar?.replace(/\D/g, '')   || '';
+  const cleanPAN    = form.pan?.replace(/\s/g, '')       || '';
+  const cleanIFSC   = form.ifscCode?.replace(/\s/g, '') || '';
 
   return (
     <div className="w-full max-w-lg mx-auto px-1 py-4 space-y-5">
@@ -44,77 +32,125 @@ const Step4Documents = ({ form, handleChange }) => {
       <div className="space-y-4">
         <SectionDivider label="Government IDs" />
 
-        <IdField
-          label="Aadhar Number" icon={IdCard}
-          show={showAadhar} onToggle={() => setShowAadhar(v => !v)}
-          inputProps={{
-            name: 'aadhar',
-            value: form.aadhar ? form.aadhar.replace(/(\d{4})(?=\d)/g, '$1 ') : '',
-            onChange: makeAadharHandler(handleChange),
-            placeholder: '1234 5678 9012',
-            maxLength: 14,
-          }}
-          isValid={cleanAadhar ? validateAadhar(cleanAadhar) : undefined}
-          validation={cleanAadhar ? {
-            valid: validateAadhar(cleanAadhar),
-            message: validateAadhar(cleanAadhar) ? 'Valid Aadhar number' : 'Must be exactly 12 digits',
-          } : null}
-          uploadName="aadharImage" uploadValue={form.aadharImage} onChange={handleChange}
-        />
+        {/* ── Aadhar ── */}
+        <DocField label="Aadhar Number" required icon={IdCard}>
+          <div className="flex items-center gap-1.5">
+            <input
+              name="aadhar"
+              type={showAadhar ? 'text' : 'password'}
+              value={form.aadhar ? form.aadhar.replace(/(\d{4})(?=\d)/g, '$1 ') : ''}
+              onChange={makeAadharHandler(handleChange)}
+              placeholder="1234 5678 9012"
+              maxLength={14}
+              className={`${docInputBase} ${
+                errors.aadhar
+                  ? 'border-red-400 dark:border-red-600'
+                  : cleanAadhar
+                    ? validBorder(validateAadhar(cleanAadhar))
+                    : ''
+              }`}
+            />
+            <EyeToggle show={showAadhar} onToggle={() => setShowAadhar(v => !v)} />
+          </div>
+          {/* Live hint while typing — hidden when submit error is present */}
+          {cleanAadhar && !errors.aadhar && (
+            <DocValidationHint
+              valid={validateAadhar(cleanAadhar)}
+              message={validateAadhar(cleanAadhar) ? 'Valid Aadhar number' : 'Must be exactly 12 digits'}
+            />
+          )}
+          {/* Inline error from submit attempt */}
+          {errors.aadhar && <DocValidationHint valid={false} message={errors.aadhar} />}
 
-        <IdField
-          label="PAN Number" icon={FileText}
-          show={showPAN} onToggle={() => setShowPAN(v => !v)}
-          inputProps={{
-            name: 'pan',
-            value: form.pan || '',
-            onChange: makePANHandler(handleChange),
-            placeholder: 'ABCDE1234F',
-            maxLength: 10,
-            style: { textTransform: 'uppercase' },
-          }}
-          isValid={cleanPAN ? validatePAN(cleanPAN) : undefined}
-          validation={cleanPAN ? {
-            valid: validatePAN(cleanPAN),
-            message: validatePAN(cleanPAN) ? 'Valid PAN number' : 'Format: ABCDE1234F',
-          } : null}
-          uploadName="panImage" uploadValue={form.panImage} onChange={handleChange}
-        />
+          <DocImageUpload label="Aadhar" name="aadharImage" value={form.aadharImage} onChange={handleChange} />
+          {errors.aadharImage && <DocValidationHint valid={false} message={errors.aadharImage} />}
+        </DocField>
+
+        {/* ── PAN ── */}
+        <DocField label="PAN Number" required icon={FileText}>
+          <div className="flex items-center gap-1.5">
+            <input
+              name="pan"
+              type={showPAN ? 'text' : 'password'}
+              value={form.pan || ''}
+              onChange={makePANHandler(handleChange)}
+              placeholder="ABCDE1234F"
+              maxLength={10}
+              style={{ textTransform: 'uppercase' }}
+              className={`${docInputBase} ${
+                errors.pan
+                  ? 'border-red-400 dark:border-red-600'
+                  : cleanPAN
+                    ? validBorder(validatePAN(cleanPAN))
+                    : ''
+              }`}
+            />
+            <EyeToggle show={showPAN} onToggle={() => setShowPAN(v => !v)} />
+          </div>
+          {/* Live hint while typing — hidden when submit error is present */}
+          {cleanPAN && !errors.pan && (
+            <DocValidationHint
+              valid={validatePAN(cleanPAN)}
+              message={validatePAN(cleanPAN) ? 'Valid PAN number' : 'Format: ABCDE1234F'}
+            />
+          )}
+          {/* Inline error from submit attempt */}
+          {errors.pan && <DocValidationHint valid={false} message={errors.pan} />}
+
+          <DocImageUpload label="PAN" name="panImage" value={form.panImage} onChange={handleChange} />
+          {errors.panImage && <DocValidationHint valid={false} message={errors.panImage} />}
+        </DocField>
       </div>
 
       <div className="space-y-4">
         <SectionDivider label="Bank Account" />
 
+        {/* ── Account Number ── */}
         <DocField label="Account Number" required icon={CreditCard}>
           <div className="flex items-center gap-1.5">
             <input
               type={showAccount ? 'text' : 'password'}
-              name="bankAccountNumber"                      
-              value={form.bankAccountNumber || ''}          
+              name="bankAccountNumber"
+              value={form.bankAccountNumber || ''}
               onChange={makeAccountHandler(handleChange)}
-              placeholder="Enter bank account number" maxLength={18}
-              className={docInputBase}
+              placeholder="Enter bank account number"
+              maxLength={18}
+              className={`${docInputBase} ${
+                errors.bankAccountNumber ? 'border-red-400 dark:border-red-600' : ''
+              }`}
             />
             <EyeToggle show={showAccount} onToggle={() => setShowAccount(v => !v)} />
           </div>
+          {errors.bankAccountNumber && <DocValidationHint valid={false} message={errors.bankAccountNumber} />}
         </DocField>
 
+        {/* ── IFSC ── */}
         <DocField label="IFSC Code" required icon={Building2}>
           <input
             type="text"
-            name="ifscCode"                                 
-            value={form.ifscCode || ''}                     
+            name="ifscCode"
+            value={form.ifscCode || ''}
             onChange={makeIFSCHandler(handleChange)}
-            placeholder="SBIN0001234" maxLength={11}
+            placeholder="SBIN0001234"
+            maxLength={11}
             style={{ textTransform: 'uppercase' }}
-            className={`${docInputBase} ${cleanIFSC ? validBorder(validateIFSC(cleanIFSC)) : ''}`}
+            className={`${docInputBase} ${
+              errors.ifscCode
+                ? 'border-red-400 dark:border-red-600'
+                : cleanIFSC
+                  ? validBorder(validateIFSC(cleanIFSC))
+                  : ''
+            }`}
           />
-          {cleanIFSC && (
+          {/* Live validation hint — shown while typing, hidden on submit error */}
+          {cleanIFSC && !errors.ifscCode && (
             <DocValidationHint
               valid={validateIFSC(cleanIFSC)}
               message={validateIFSC(cleanIFSC) ? 'Valid IFSC code' : 'Invalid IFSC — e.g. SBIN0001234'}
             />
           )}
+          {/* Inline error from submit attempt */}
+          {errors.ifscCode && <DocValidationHint valid={false} message={errors.ifscCode} />}
         </DocField>
       </div>
 

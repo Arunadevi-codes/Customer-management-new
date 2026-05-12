@@ -25,18 +25,22 @@ exports.getStaff = async (req, res) => {
 
     const { sortField, sortOrder, needsCollation } = getSortOptions(
       req.query,
-      "createdAt",
+      null,                          // no default sort
       ["fullName", "email", "phone"]
     );
 
-    const queryBuilder = Staff.find(query)
+    // ✅ Default: newest first when no sort is specified
+    const appliedSortField = sortField || "createdAt";
+    const appliedSortOrder = sortField ? sortOrder : -1;
+
+    let queryBuilder = Staff.find(query)
       .select("-password")
-      .sort({ [sortField]: sortOrder })
+      .sort({ [appliedSortField]: appliedSortOrder })
       .skip(skip)
       .limit(limit);
 
-    if (needsCollation) {
-      queryBuilder.collation({ locale: "en", strength: 2 });
+    if (sortField && needsCollation) {
+      queryBuilder = queryBuilder.collation({ locale: "en", strength: 2 });
     }
 
     const staffs = await queryBuilder;

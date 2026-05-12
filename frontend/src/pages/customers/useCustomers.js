@@ -18,9 +18,8 @@ export const useCustomers = () => {
   const [toDate, setToDate] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [showView, setShowView] = useState(false);
-  const [sortField, setSortField] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("desc"); 
-  // const [originalCustomers] = useState(customers); 
+  const [sortField, setSortField] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
 
   const totalPages = Math.ceil(total / limit) || 1;
 
@@ -51,21 +50,21 @@ export const useCustomers = () => {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
-      const offset = page - 1
+      const offset = page - 1;
 
       const params = new URLSearchParams();
       params.append("offset", offset);
       params.append("limit", limit);
       if (sortField && sortOrder) {
-  params.append("sortField", sortField);
-  params.append("sortOrder", sortOrder);
-}
+        params.append("sortField", sortField);
+        params.append("sortOrder", sortOrder);
+      }
 
       // 📅 If date filter → ignore search
       if (fromDate || toDate) {
         if (fromDate) params.append("fromDate", fromDate);
         if (toDate) params.append("toDate", toDate);
-      } 
+      }
       // 🔍 Only if no date → send search
       else if (debouncedSearch) {
         params.append("search", debouncedSearch);
@@ -102,34 +101,35 @@ export const useCustomers = () => {
     setIsDeleteModalOpen(true);
   };
 
- const handleSort = (field) => {
-  if (sortField === field) {
-    if (sortOrder === "asc") {
-      setSortOrder("desc");
-    } else if (sortOrder === "desc") {
-      setSortField(null);
-      setSortOrder(null);
+  // ✅ Sort cycle: default(no arrow) → asc(↑) → desc(↓) → reset to default(createdAt desc)
+  const handleSort = (field) => {
+    if (sortField === field) {
+      if (sortOrder === "asc") {
+        // 2nd click → descending
+        setSortOrder("desc");
+      } else if (sortOrder === "desc") {
+        // 3rd click → reset to default (newest first)
+        setSortField("createdAt");
+        setSortOrder("desc");
+      }
     } else {
+      // 1st click on a new field → ascending
+      setSortField(field);
       setSortOrder("asc");
     }
-  } else {
-    setSortField(field);
-    setSortOrder("asc");
-  }
-};
+  };
 
   const handleView = async (id) => {
-  
-  try {
-    const res = await API.get(`/customers/${id}`);
-    console.log("DATA:", res.data); 
-    setSelectedCustomer(res.data);
-    setShowView(true);
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to load customer details");
-  }
-};
+    try {
+      const res = await API.get(`/customers/${id}`);
+      console.log("DATA:", res.data);
+      setSelectedCustomer(res.data);
+      setShowView(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load customer details");
+    }
+  };
 
   const handleSaveCustomer = async (formData) => {
     try {
@@ -137,7 +137,6 @@ export const useCustomers = () => {
         await API.put(`/customers/${editingCustomer._id}`, formData);
       } else {
         await API.post("/customers", formData);
-
       }
       fetchCustomers();
       setIsModalOpen(false);
@@ -158,8 +157,6 @@ export const useCustomers = () => {
       toast.error("Delete failed");
     }
   };
-
-  
 
   return {
     customers, loading, searchTerm, setSearchTerm, isModalOpen,

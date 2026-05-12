@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, CheckCircle, XCircle, ShieldCheck, Info } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, CheckCircle, ShieldCheck, Info } from 'lucide-react';
 
 const inputBase =
   "w-full pl-10 pr-10 py-2.5 rounded-xl text-sm bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-500 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 transition-all duration-200";
@@ -30,7 +30,15 @@ const PasswordToggle = ({ show, onToggle }) => (
   </button>
 );
 
-const Step3Login = ({ form, handleChange, isEdit }) => {
+// Inline error message component
+const InlineError = ({ message }) =>
+  message ? (
+    <p className="mt-1 text-xs text-red-500 dark:text-red-400 flex items-center gap-1 font-medium">
+      {message}
+    </p>
+  ) : null;
+
+const Step3Login = ({ form, handleChange, isEdit, errors = {} }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -84,21 +92,24 @@ const Step3Login = ({ form, handleChange, isEdit }) => {
       </div>
 
       {/* Email */}
-      <Field
-        label="Login Email"
-        required
-        icon={Mail}
-        hint="This email will be used to log into the account"
-      >
-        <input
-          type="email"
-          name="loginEmail"
-          placeholder="staff@company.com"
-          value={form.loginEmail || ''}
-          onChange={handleChange}
-          className={inputBase}
-        />
-      </Field>
+      <div>
+        <Field
+          label="Login Email"
+          required
+          icon={Mail}
+          hint="This email will be used to log into the account"
+        >
+          <input
+            type="email"
+            name="loginEmail"
+            placeholder="staff@company.com"
+            value={form.loginEmail || ''}
+            onChange={handleChange}
+            className={`${inputBase} ${errors.loginEmail ? 'border-red-400 dark:border-red-500 focus:ring-red-400' : ''}`}
+          />
+        </Field>
+        <InlineError message={errors.loginEmail} />
+      </div>
 
       {/* Password */}
       <div>
@@ -115,7 +126,7 @@ const Step3Login = ({ form, handleChange, isEdit }) => {
             placeholder={isEdit ? 'Enter new password to change' : 'Create a strong password'}
             value={form.password || ''}
             onChange={handleChange}
-            className={inputBase}
+            className={`${inputBase} ${errors.password ? 'border-red-400 dark:border-red-500 focus:ring-red-400' : ''}`}
           />
           <PasswordToggle show={showPassword} onToggle={() => setShowPassword(!showPassword)} />
         </div>
@@ -137,6 +148,7 @@ const Step3Login = ({ form, handleChange, isEdit }) => {
             </p>
           </div>
         )}
+        <InlineError message={errors.password} />
       </div>
 
       {/* Confirm Password */}
@@ -155,27 +167,32 @@ const Step3Login = ({ form, handleChange, isEdit }) => {
             value={form.confirmPassword || ''}
             onChange={handleChange}
             className={`${inputBase} ${
-              form.confirmPassword
-                ? passwordsMatch
-                  ? 'border-green-400 dark:border-green-600 focus:ring-green-500'
-                  : 'border-red-400 dark:border-red-600 focus:ring-red-500'
-                : ''
+              errors.confirmPassword
+                ? 'border-red-400 dark:border-red-600 focus:ring-red-500'
+                : form.confirmPassword
+                  ? passwordsMatch
+                    ? 'border-green-400 dark:border-green-600 focus:ring-green-500'
+                    : 'border-red-400 dark:border-red-600 focus:ring-red-500'
+                  : ''
             }`}
           />
           <PasswordToggle show={showConfirm} onToggle={() => setShowConfirm(!showConfirm)} />
         </div>
 
+        {/* Live match indicator (only when user has typed something) */}
         {form.confirmPassword && (
           <p className={`mt-1.5 text-xs flex items-center gap-1.5 font-medium ${
             passwordsMatch ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'
           }`}>
-            {passwordsMatch
-              ? <CheckCircle className="w-3.5 h-3.5" />
-              : <XCircle className="w-3.5 h-3.5" />
-            }
+            {passwordsMatch && (
+              <CheckCircle className="w-3.5 h-3.5" />
+            )}
             {passwordsMatch ? 'Passwords match' : 'Passwords do not match'}
           </p>
         )}
+
+        {/* Inline error — shown only when field is empty and form was submitted */}
+        {!form.confirmPassword && <InlineError message={errors.confirmPassword} />}
       </div>
 
     </div>

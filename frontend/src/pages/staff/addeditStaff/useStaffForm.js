@@ -17,15 +17,15 @@ const useStaffForm = (staff) => {
 
   const [form, setForm] = useState({
     // ── Step 1: Personal ──────────────────────────────────────
-    fullName: "",           
+    fullName: "",
     email: "",
     phone: "",
-    emergencyContact: "",   
+    emergencyContact: "",
     gender: "",
-    dateOfBirth: "",      
+    dateOfBirth: "",
     profileImage: null,
     // ── Step 1: Address ───────────────────────────────────────
-    addressLine: "",       
+    addressLine: "",
     city: "",
     state: "",
     pincode: "",
@@ -33,8 +33,8 @@ const useStaffForm = (staff) => {
     // ── Step 2: Job Info ──────────────────────────────────────
     role: "",
     employeeId: "",
-    dateOfJoining: "",     
-    status: "active",
+    dateOfJoining: "",
+    status: "",
     // ── Step 3: Login ─────────────────────────────────────────
     loginEmail: "",
     password: "",
@@ -42,8 +42,8 @@ const useStaffForm = (staff) => {
     // ── Step 4: Documents ─────────────────────────────────────
     aadhar: "",
     pan: "",
-    bankAccountNumber: "",  
-    ifscCode: "",           
+    bankAccountNumber: "",
+    ifscCode: "",
     aadharImage: null,
     panImage: null,
   });
@@ -133,21 +133,35 @@ const useStaffForm = (staff) => {
   };
 
   // ── HANDLE INPUT ──────────────────────────────────────────
-const handleChange = (e) => {
-  const { name, value, files } = e.target;
-  if (files) {
-    setForm((prev) => ({ ...prev, [name]: files[0] }));
-  } else {
-    // ✅ treat empty string as null (handles image removal)
-    setForm((prev) => ({ ...prev, [name]: value === "" ? null : (value ?? null) }));
-  }
-};
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (files) {
+      setForm((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      // ✅ treat empty string as null (handles image removal)
+      setForm((prev) => ({ ...prev, [name]: value === "" ? null : (value ?? null) }));
+    }
+    // ✅ clear the inline error for this field as soon as user interacts
+    setErrors((prev) => {
+      if (!prev[name]) return prev;
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  };
 
   // ── HANDLE STATE CHANGE ───────────────────────────────────
   const handleStateChange = (e) => {
     const stateId = e.target.value;
     setForm((prev) => ({ ...prev, state: stateId, city: "" }));
     fetchCities(stateId);
+    // clear state/city errors on change
+    setErrors((prev) => {
+      const next = { ...prev };
+      delete next.state;
+      delete next.city;
+      return next;
+    });
   };
 
   // ── VALIDATION PER STEP ───────────────────────────────────
@@ -166,29 +180,66 @@ const handleChange = (e) => {
 
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
-        return "validation_error"; // sentinel — do NOT toast
+        return "validation_error";
       }
       setErrors({});
     }
 
-    if (step === 2 && (!form.role || !form.dateOfJoining))
-      return "Fill job details";
+    if (step === 2) {
+      const newErrors = {};
+      if (!form.role)          newErrors.role          = "Role is required";
+      if (!form.dateOfJoining) newErrors.dateOfJoining = "Joining date is required";
+      if (!form.status)        newErrors.status        = "Status is required";
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return "validation_error";
+      }
+      setErrors({});
+    }
 
     if (step === 3 && !isEdit) {
-      if (!form.loginEmail || !form.password || !form.confirmPassword)
-        return "Fill login credentials";
-      if (form.password !== form.confirmPassword)
-        return "Passwords do not match";
-    }
+      const newErrors = {};
+      if (!form.loginEmail)      newErrors.loginEmail      = "Login email is required";
+      if (!form.password)        newErrors.password        = "Password is required";
+      if (!form.confirmPassword) newErrors.confirmPassword = "Please confirm your password";
+      else if (form.password !== form.confirmPassword)
+        newErrors.confirmPassword = "Passwords do not match";
 
-    // ── Step 4: block submit if IFSC is filled but invalid ──
-    if (step === 4) {
-      const cleanIFSC = form.ifscCode?.replace(/\s/g, "") || "";
-      if (cleanIFSC && !validateIFSC(cleanIFSC)) {
-        return "Invalid IFSC code — e.g. SBIN0001234";
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors);
+        return "validation_error";
       }
+      setErrors({});
     }
 
+    // ── Step 4: all fields required + format validation ──
+if (step === 4) {
+  const newErrors = {};
+  const cleanAadhar = form.aadhar?.replace(/\D/g, "")    || "";
+  const cleanPAN    = form.pan?.replace(/\s/g, "")        || "";
+  const cleanIFSC   = form.ifscCode?.replace(/\s/g, "")  || "";
+
+  if (!cleanAadhar)                                                    newErrors.aadhar            = "Aadhar number is required";
+  else if (!/^\d{12}$/.test(cleanAadhar))                              newErrors.aadhar            = "Must be exactly 12 digits";
+
+  if (!cleanPAN)                                                       newErrors.pan               = "PAN number is required";
+  else if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(cleanPAN.toUpperCase()))   newErrors.pan               = "Format: ABCDE1234F";
+
+  if (!form.bankAccountNumber)                                         newErrors.bankAccountNumber = "Account number is required";
+
+  if (!cleanIFSC)                                                      newErrors.ifscCode          = "IFSC code is required";
+  else if (!validateIFSC(cleanIFSC))                                   newErrors.ifscCode          = "Invalid IFSC — e.g. SBIN0001234";
+
+  if (!form.aadharImage)                                               newErrors.aadharImage       = "Aadhar document is required";
+  if (!form.panImage)                                                  newErrors.panImage          = "PAN document is required";
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return "validation_error";
+  }
+  setErrors({});
+}
     return null;
   };
 
@@ -199,9 +250,13 @@ const handleChange = (e) => {
     } else if (error !== "validation_error") {
       toast.error(error);
     }
+    // "validation_error" → inline errors already set, no toast
   };
 
-  const prevStep = () => setStep((prev) => prev - 1);
+  const prevStep = () => {
+    setErrors({});
+    setStep((prev) => prev - 1);
+  };
 
   return {
     isEdit, step, loading, setLoading,

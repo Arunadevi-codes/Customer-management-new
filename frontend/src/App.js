@@ -8,7 +8,7 @@ import Customers from "./pages/customers/customers";
 import Staff from "./pages/staff/staff";
 
 import StaffDashboard   from "./staffPages/staffDashboard";
-import AccountSettings  from "./staffPages/accountSettings";
+import AccountSettings  from "./pages/accountProfile/accountSettings";
 
 import ProtectedRoute from "./components/protectedRoute";
 import StaffProtectedRoute from "./components/staffprotectedRoute";

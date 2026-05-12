@@ -29,9 +29,9 @@ export const useStaff = () => {
   const [viewStaff, setViewStaff] = useState(null);
 
   // MODAL ACTIONS
-  const handleAddClick    = () => { setEditingStaff(null); setIsModalOpen(true); };
-  const handleEditClick   = (staff) => { setEditingStaff(staff); setIsModalOpen(true); };
-  const handleViewClick   = (staff) => { setViewStaff(staff); };
+  const handleAddClick = () => { setEditingStaff(null); setIsModalOpen(true); };
+  const handleEditClick = (staff) => { setEditingStaff(staff); setIsModalOpen(true); };
+  const handleViewClick = (staff) => { setViewStaff(staff); };
   const handleDeleteClick = (id) => { setSelectedStaffId(id); setIsDeleteModalOpen(true); };
 
   // DELETE

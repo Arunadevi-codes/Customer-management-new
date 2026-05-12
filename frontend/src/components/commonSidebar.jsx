@@ -1,20 +1,26 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, LogOut, X } from "lucide-react";
-import { useAuth } from "../../contexts/authContext";
-import logoIcon from "../../images/logo-icon.png";
+import { LogOut, X } from "lucide-react";
+import logoIcon from "../images/logo-icon.png";
 
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, to: "/staff-dashboard" },
-];
-
-const StaffSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
-  const { logout } = useAuth();
+const CommonSidebar = ({
+  collapsed,
+  mobileOpen,
+  setMobileOpen,
+  navItems,
+  onLogout,
+}) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    navigate("/login");
+    if (onLogout) {
+      onLogout();
+    } else {
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      navigate("/");
+    }
+
     setMobileOpen(false);
   };
 
@@ -39,29 +45,34 @@ const StaffSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) =>
           md:translate-x-0
         `}
       >
-        {/* Logo area */}
+        {/* Logo */}
         <div className="flex items-center justify-between px-3 py-4 border-b border-gray-100 dark:border-gray-800 min-h-[57px]">
-          {!collapsed && (
+          {!collapsed ? (
             <div className="flex items-center gap-2">
               <img
                 src={logoIcon}
                 alt="Logo"
-                className="w-7 h-7 rounded-lg object-contain flex-shrink-0"
+                className="w-7 h-7 rounded-lg object-contain"
               />
+
               <div className="leading-none">
-                <p className="text-sm font-bold text-gray-800 dark:text-white">InApp</p>
-                <p className="text-[10px] text-gray-400 dark:text-gray-500">Inventory.App</p>
+                <p className="text-sm font-bold text-gray-800 dark:text-white">
+                  InApp
+                </p>
+
+                <p className="text-[10px] text-gray-400 dark:text-gray-500">
+                  Inventory.App
+                </p>
               </div>
             </div>
-          )}
-          {collapsed && (
+          ) : (
             <img
               src={logoIcon}
               alt="Logo"
               className="w-7 h-7 rounded-lg object-contain mx-auto"
             />
           )}
-          {/* Mobile close btn */}
+
           <button
             onClick={() => setMobileOpen(false)}
             className="md:hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
@@ -70,7 +81,7 @@ const StaffSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) =>
           </button>
         </div>
 
-        {/* Nav items */}
+        {/* Nav */}
         <nav className="flex-1 px-2 py-2 space-y-0.5 overflow-y-auto">
           {navItems.map(({ label, icon: Icon, to }) => (
             <NavLink
@@ -79,19 +90,20 @@ const StaffSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) =>
               onClick={() => setMobileOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-150
-                ${isActive
-                  ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
-                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-white"
+                ${
+                  isActive
+                    ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
+                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-white"
                 }`
               }
             >
               <Icon className="w-4 h-4 flex-shrink-0" />
-              {!collapsed && <span className="truncate">{label}</span>}
+              {!collapsed && <span>{label}</span>}
             </NavLink>
           ))}
         </nav>
 
-        {/* Logout button */}
+        {/* Logout */}
         <div className="px-2 py-3 border-t border-gray-100 dark:border-gray-800">
           <button
             onClick={handleLogout}
@@ -102,7 +114,7 @@ const StaffSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) =>
               transition-all duration-150"
           >
             <LogOut className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && <span className="truncate">Logout</span>}
+            {!collapsed && <span>Logout</span>}
           </button>
         </div>
       </aside>
@@ -110,4 +122,4 @@ const StaffSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) =>
   );
 };
 
-export default StaffSidebar;
+export default CommonSidebar;

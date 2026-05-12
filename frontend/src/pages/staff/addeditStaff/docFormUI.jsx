@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Eye, EyeOff, CheckCircle, XCircle, Upload, FileText, X, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle, Upload, FileText, X } from 'lucide-react';
 
 export const inputBase =
   "w-full pl-10 pr-10 py-2.5 rounded-xl text-sm bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-500 focus:border-transparent focus:bg-white dark:focus:bg-gray-800 transition-all duration-200";
@@ -29,7 +29,7 @@ export const Field = ({ label, required, icon: Icon, toggle, onToggle, showValue
       <p className={`mt-1.5 text-xs flex items-center gap-1.5 font-medium ${
         validation.valid ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'
       }`}>
-        {validation.valid ? <CheckCircle className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+        {validation.valid && <CheckCircle className="w-3.5 h-3.5" />}
         {validation.message}
       </p>
     )}
@@ -69,8 +69,14 @@ export const DocField = ({ label, required, icon: Icon, children }) => (
 
 // Inline validation hint
 export const DocValidationHint = ({ valid, message }) => (
-  <p className={`flex items-center gap-1.5 text-xs font-medium ${valid ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
-    {valid ? <CheckCircle className="w-3.5 h-3.5 shrink-0" /> : <AlertCircle className="w-3.5 h-3.5 shrink-0" />}
+  <p
+    className={`text-xs font-medium ${
+      valid
+        ? 'text-green-600 dark:text-green-400'
+        : 'text-red-500 dark:text-red-400'
+    }`}
+  >
+    {valid && <CheckCircle className="w-3.5 h-3.5 shrink-0 inline mr-1" />}
     {message}
   </p>
 );
