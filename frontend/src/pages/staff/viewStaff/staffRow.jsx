@@ -5,24 +5,15 @@ const StaffRow = ({ staff, onEdit, onDelete, onView }) => {
   const [tooltip, setTooltip] = useState({ visible: false, x: 0, y: 0 });
 
   const handleMouseEnter = (e) => {
-  const rect = e.currentTarget.getBoundingClientRect();
-
-  const tooltipWidth = 280; // same as max-w-[280px]
-  const padding = 12;
-
-  let left = rect.left;
-
-  // Prevent tooltip from going outside screen
-  if (left + tooltipWidth > window.innerWidth) {
-    left = window.innerWidth - tooltipWidth - padding;
-  }
-
-  setTooltip({
-    visible: true,
-    x: left,
-    y: rect.bottom + 8,
-  });
-};
+    const rect = e.currentTarget.getBoundingClientRect();
+    const tooltipWidth = 280;
+    const padding = 12;
+    let left = rect.left;
+    if (left + tooltipWidth > window.innerWidth) {
+      left = window.innerWidth - tooltipWidth - padding;
+    }
+    setTooltip({ visible: true, x: left, y: rect.bottom + 8 });
+  };
 
   const handleMouseLeave = () => {
     setTooltip({ visible: false, x: 0, y: 0 });
@@ -73,14 +64,13 @@ const StaffRow = ({ staff, onEdit, onDelete, onView }) => {
           {staff.email || "—"}
         </div>
 
-        {/* ✅ Fixed-position tooltip — escapes overflow:hidden/auto entirely */}
         {tooltip.visible && staff.email && (
           <div
-  className="fixed z-[9999] bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg px-3 py-2 shadow-lg max-w-[280px] break-words whitespace-normal pointer-events-none"
-  style={{ top: tooltip.y, left: tooltip.x }}
->
-  {staff.email}
-</div>
+            className="fixed z-[9999] bg-gray-700 dark:bg-gray-800 text-white text-xs rounded-lg px-3 py-2 shadow-lg max-w-[280px] break-words whitespace-normal pointer-events-none"
+            style={{ top: tooltip.y, left: tooltip.x }}
+          >
+            {staff.email}
+          </div>
         )}
       </td>
 
@@ -106,30 +96,36 @@ const StaffRow = ({ staff, onEdit, onDelete, onView }) => {
         </div>
       </td>
 
-      {/* ACTIONS */}
+      {/* ACTIONS — conditionally rendered based on passed props */}
       <td className="px-3 sm:px-4 py-2 sm:py-3">
         <div className="flex gap-1.5 sm:gap-2">
-          <button
-            onClick={() => onView(staff)}
-            className="p-1.5 sm:p-1 text-green-600 hover:bg-green-50 dark:hover:bg-gray-800 rounded-lg transition"
-            title="View staff"
-          >
-            <Eye size={16} />
-          </button>
-          <button
-            onClick={() => onEdit(staff)}
-            className="p-1.5 sm:p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition"
-            title="Edit staff"
-          >
-            <Edit size={16} />
-          </button>
-          <button
-            onClick={() => onDelete(staff._id)}
-            className="p-1.5 sm:p-1 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 rounded-lg transition"
-            title="Delete staff"
-          >
-            <Trash2 size={16} />
-          </button>
+          {onView && (
+            <button
+              onClick={() => onView(staff)}
+              className="p-1.5 sm:p-1 text-green-600 hover:bg-green-50 dark:hover:bg-gray-800 rounded-lg transition"
+              title="View staff"
+            >
+              <Eye size={16} />
+            </button>
+          )}
+          {onEdit && (
+            <button
+              onClick={() => onEdit(staff)}
+              className="p-1.5 sm:p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition"
+              title="Edit staff"
+            >
+              <Edit size={16} />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              onClick={() => onDelete(staff._id)}
+              className="p-1.5 sm:p-1 text-red-600 hover:bg-red-50 dark:hover:bg-gray-800 rounded-lg transition"
+              title="Delete staff"
+            >
+              <Trash2 size={16} />
+            </button>
+          )}
         </div>
       </td>
 

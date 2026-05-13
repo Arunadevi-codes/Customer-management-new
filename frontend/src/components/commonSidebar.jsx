@@ -39,7 +39,7 @@ const CommonSidebar = ({
           fixed top-0 left-0 h-full z-30
           bg-white dark:bg-gray-900
           border-r border-gray-200 dark:border-gray-800
-          flex flex-col transition-all duration-300 shadow-sm
+          flex flex-col transition-all duration-150 shadow-sm
           ${collapsed ? "w-14" : "w-48"}
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
@@ -92,7 +92,7 @@ const CommonSidebar = ({
                 `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-150
                 ${
                   isActive
-                    ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
+                    ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400"
                     : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-white"
                 }`
               }
