@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import AdminForm from "./adminForm";
-import StaffForm from "./staffForm";
+import LoginForm from "./loginForm";
 import logo     from "../images/logo.png";
 import customer from "../images/customer.jpeg";
 
@@ -43,14 +42,8 @@ const Login = () => {
               ))}
             </div>
 
-            {/* ✅ Both forms always mounted — hidden via CSS, never unmounted */}
-            {/* This prevents state reset and autofill loss on toggle */}
-            <div className={loginType === "admin" ? "block" : "hidden"}>
-              <AdminForm />
-            </div>
-            <div className={loginType === "staff" ? "block" : "hidden"}>
-              <StaffForm />
-            </div>
+            {/* Single form — role prop drives the logic */}
+            <LoginForm role={loginType} />
 
           </div>
         </div>

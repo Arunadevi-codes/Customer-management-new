@@ -1,20 +1,26 @@
-// src/pages/customers/customers.jsx
+import React, { useState, useEffect } from 'react';
 
-import React from 'react';
-
-import PageHeader     from '../../components/ui/pageHeader';
+import PageHeader from '../../components/ui/pageHeader';
 import TableSearchBar from '../../components/ui/tableSearchBar';
 import LoadingSpinner from '../../components/ui/loadingSpinner';
 import TablePagination from '../../components/ui/tablePagination';
 
-import { useCustomers }  from './useCustomers';
-import ViewCustomer      from './viewCustomer/viewCustomer';
-import ViewCustomers     from './customerPOPup';
-import CustomerForm      from './addeditCustomer/customerForm';
-import DeleteCustomer    from './deleteCustomer';
-import statesData        from '../../data/statesData';
+import { useCustomers } from './useCustomers';
+import ViewCustomer from './viewCustomer';
+import ViewCustomers from './customerPOPup';
+import CustomerForm from './addeditCustomer/customerForm';
+import DeleteCustomer from './deleteCustomer';
+import statesData from '../../data/statesData';
 
 const Customers = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const {
     customers,
@@ -54,7 +60,7 @@ const Customers = () => {
   } = useCustomers();
 
   return (
-    <div className="p-3 md:p-4 space-y-2 min-h-screen">
+    <div className="w-full min-h-screen p-3 md:p-4 space-y-4">
 
       {/* HEADER */}
       <PageHeader
@@ -66,38 +72,42 @@ const Customers = () => {
         onAddClick={handleAddClick}
       />
 
-      {/* SEARCH + DATE FILTER */}
+      {/* SEARCH */}
       <TableSearchBar
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         total={total}
         totalLabel="customers"
-        placeholder="Search by name, email or phone..."
+        placeholder={isMobile ? 'Search...' : 'Search by name, email or phone...'}
         fromDate={fromDate}
         toDate={toDate}
         onFromDateChange={setFromDate}
         onToDateChange={setToDate}
       />
 
-      {/* TABLE / LOADING */}
+      {/* TABLE */}
       {loading ? (
         <LoadingSpinner label="Loading customers..." />
       ) : (
         <>
-          <ViewCustomer
-            customers={customers}
-            states={states}
-            cities={cities}
-            pincode={pincode}
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            total={total}
-            onView={handleView}
-            onSort={handleSort}
-            sortField={sortField}
-            sortOrder={sortOrder}
-          />
+          {/* This div is the true boundary — it never exceeds the page width */}
+          <div className="w-full max-w-full min-w-0">
+            <ViewCustomer
+              customers={customers}
+              states={states}
+              cities={cities}
+              pincode={pincode}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
+              total={total}
+              onView={handleView}
+              onSort={handleSort}
+              sortField={sortField}
+              sortOrder={sortOrder}
+            />
+          </div>
 
+          {/* PAGINATION */}
           {total > 0 && (
             <TablePagination
               page={page}
@@ -113,7 +123,7 @@ const Customers = () => {
         </>
       )}
 
-      {/* ADD / EDIT FORM MODAL */}
+      {/* ADD / EDIT */}
       {isModalOpen && (
         <CustomerForm
           customer={editingCustomer}
@@ -122,7 +132,7 @@ const Customers = () => {
         />
       )}
 
-      {/* DELETE CONFIRM MODAL */}
+      {/* DELETE */}
       {isDeleteModalOpen && (
         <DeleteCustomer
           onConfirm={handleConfirmDelete}
@@ -130,7 +140,7 @@ const Customers = () => {
         />
       )}
 
-      {/* VIEW POPUP */}
+      {/* VIEW */}
       {showView && (
         <ViewCustomers
           customer={selectedCustomer}
@@ -138,7 +148,6 @@ const Customers = () => {
           states={Object.values(statesData)}
         />
       )}
-
     </div>
   );
 };

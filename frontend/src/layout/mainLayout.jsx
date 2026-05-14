@@ -22,7 +22,6 @@ const MainLayout = () => {
 
   const isStaff = user?.role === "staff";
 
-  // ── Nav items based on role ──────────────────────────────────────────────
   const adminNavItems = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
     { label: "Customers", icon: Users, to: "/customers" },
@@ -36,11 +35,9 @@ const MainLayout = () => {
 
   const navItems = isStaff ? staffNavItems : adminNavItems;
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
   const getInitials = (name = "") =>
     name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
-  // ── Staff topbar dropdown ────────────────────────────────────────────────
   const StaffRight = (
     <div className="relative">
       <button
@@ -67,8 +64,6 @@ const MainLayout = () => {
         <>
           <div className="fixed inset-0 z-40" onClick={() => setDropdownOpen(false)} />
           <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 overflow-hidden">
-
-            {/* Profile info */}
             <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
@@ -94,8 +89,6 @@ const MainLayout = () => {
                 </div>
               </div>
             </div>
-
-            {/* Account Settings link */}
             <div className="py-1">
               <NavLink
                 to="/staff-account"
@@ -112,7 +105,6 @@ const MainLayout = () => {
     </div>
   );
 
-  // ── Admin topbar static badge ────────────────────────────────────────────
   const AdminRight = (
     <div className="flex items-center gap-2">
       <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-semibold">
@@ -136,8 +128,10 @@ const MainLayout = () => {
         onLogout={() => { logout(); navigate("/"); }}
       />
 
+      {/* On mobile: no margin (sidebar is fixed overlay)
+          On md+: margin matches sidebar width              */}
       <div
-        className={`flex-1 flex flex-col h-screen transition-all duration-300 ${
+        className={`flex-1 flex flex-col h-screen min-w-0 transition-all duration-300 ${
           collapsed ? "md:ml-14" : "md:ml-48"
         }`}
       >
@@ -147,7 +141,7 @@ const MainLayout = () => {
           rightContent={isStaff ? StaffRight : AdminRight}
         />
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 bg-white dark:bg-gray-950">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-white dark:bg-gray-950">
           <Outlet />
         </main>
       </div>
