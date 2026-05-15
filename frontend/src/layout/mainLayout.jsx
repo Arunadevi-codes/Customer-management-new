@@ -20,17 +20,19 @@ const MainLayout = () => {
   const [mobileOpen,   setMobileOpen]   = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const isStaff = user?.role === "staff";
+  // ✅ Anyone who is NOT superadmin is treated as staff
+  const isStaff = user?.role !== "superadmin";
 
   const adminNavItems = [
     { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard" },
     { label: "Customers", icon: Users, to: "/customers" },
-    { label: "Staff", icon: Briefcase, to: "/staff" },
+    { label: "Staff", icon: Briefcase, to: "/staff"     },
   ];
 
   const staffNavItems = [
-    { label: "Dashboard", icon: LayoutDashboard, to: "/staff-dashboard" },
-    { label: "Staff Directory", icon: Users, to: "/staff-directory" },
+    { label: "Dashboard", icon: LayoutDashboard, to: "/staff-dashboard"  },
+    { label: "Customers", icon: Users, to: "/staff-customers"        },
+    { label: "Staff Directory", icon: Briefcase, to: "/staff-directory"  },
   ];
 
   const navItems = isStaff ? staffNavItems : adminNavItems;
@@ -127,9 +129,6 @@ const MainLayout = () => {
         navItems={navItems}
         onLogout={() => { logout(); navigate("/"); }}
       />
-
-      {/* On mobile: no margin (sidebar is fixed overlay)
-          On md+: margin matches sidebar width              */}
       <div
         className={`flex-1 flex flex-col h-screen min-w-0 transition-all duration-300 ${
           collapsed ? "md:ml-14" : "md:ml-48"

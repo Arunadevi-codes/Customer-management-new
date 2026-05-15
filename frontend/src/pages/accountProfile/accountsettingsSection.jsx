@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import { X, Eye, FileText } from "lucide-react";
-import { SectionTitle, Field, TextInput, SelectInput } from "./accountSettingsUI";
+// ✅ Import PhoneInput alongside the others
+import { SectionTitle, Field, TextInput, PhoneInput, SelectInput } from "./accountSettingsUI";
 
 const BASE_URL = "http://localhost:5000";
 
@@ -115,17 +116,22 @@ export const PersonalSection = ({ form, profile, handleField, handleStateChange,
         <TextInput name="fullName" value={form.fullName} onChange={handleField} disabled={!editing} />
       </Field>
       <Field label="Email">
-        <TextInput value={profile?.email || ""} disabled />
+        <TextInput name="email" value={form.email || profile?.email || ""} onChange={handleField} disabled={!editing} />
       </Field>
       <Field label="Login Email">
         <TextInput value={form.loginEmail} disabled />
       </Field>
+
+      {/* ✅ Phone — numbers only, max 10 digits */}
       <Field label="Phone">
-        <TextInput name="phone" value={form.phone} onChange={handleField} disabled={!editing} />
+        <PhoneInput name="phone" value={form.phone} onChange={handleField} disabled={!editing} />
       </Field>
+
+      {/* ✅ Emergency Contact — numbers only, max 10 digits */}
       <Field label="Emergency Contact">
-        <TextInput name="emergencyContact" value={form.emergencyContact} onChange={handleField} disabled={!editing} />
+        <PhoneInput name="emergencyContact" value={form.emergencyContact} onChange={handleField} disabled={!editing} />
       </Field>
+
       <Field label="Gender">
         <SelectInput name="gender" value={form.gender} onChange={handleField} disabled={!editing}>
           <option value="">Select Gender</option>
@@ -194,7 +200,6 @@ export const DocumentsSection = ({ form, profile, handleField, editing }) => (
         <Field label="Aadhar Number">
           <TextInput name="aadhar" value={form.aadhar} onChange={handleField} disabled={!editing} />
         </Field>
-        {/* ✅ Preview with lightbox — uses stored path directly */}
         <DocPreview label="Aadhar Document" storedPath={profile?.aadharImage} />
       </div>
 
@@ -203,7 +208,6 @@ export const DocumentsSection = ({ form, profile, handleField, editing }) => (
         <Field label="PAN Number">
           <TextInput name="pan" value={form.pan} onChange={handleField} disabled={!editing} />
         </Field>
-        {/* ✅ Preview with lightbox */}
         <DocPreview label="PAN Document" storedPath={profile?.panImage} />
       </div>
 

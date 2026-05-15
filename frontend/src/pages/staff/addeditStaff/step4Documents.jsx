@@ -9,6 +9,8 @@ import {
   makeAadharHandler, makePANHandler, makeIFSCHandler, makeAccountHandler,
 } from './docValidators';
 
+const BASE_URL = "http://localhost:5000";
+
 const validBorder = (ok) =>
   ok ? 'border-emerald-400 dark:border-emerald-600' : 'border-red-400 dark:border-red-600';
 
@@ -20,6 +22,14 @@ const Step4Documents = ({ form, handleChange, errors = {} }) => {
   const cleanAadhar = form.aadhar?.replace(/\D/g, '')   || '';
   const cleanPAN    = form.pan?.replace(/\s/g, '')       || '';
   const cleanIFSC   = form.ifscCode?.replace(/\s/g, '') || '';
+
+  // ✅ Build full URL for existing stored image paths
+  const buildUrl = (storedPath) => {
+    if (!storedPath) return null;
+    if (storedPath instanceof File) return URL.createObjectURL(storedPath);
+    const clean = storedPath.replace(/\\/g, "/").replace(/^\/+/, "");
+    return `${BASE_URL}/${clean}`;
+  };
 
   return (
     <div className="w-full max-w-lg mx-auto px-1 py-4 space-y-5">
@@ -52,17 +62,22 @@ const Step4Documents = ({ form, handleChange, errors = {} }) => {
             />
             <EyeToggle show={showAadhar} onToggle={() => setShowAadhar(v => !v)} />
           </div>
-          {/* Live hint while typing — hidden when submit error is present */}
           {cleanAadhar && !errors.aadhar && (
             <DocValidationHint
               valid={validateAadhar(cleanAadhar)}
               message={validateAadhar(cleanAadhar) ? 'Valid Aadhar number' : 'Must be exactly 12 digits'}
             />
           )}
-          {/* Inline error from submit attempt */}
           {errors.aadhar && <DocValidationHint valid={false} message={errors.aadhar} />}
 
-          <DocImageUpload label="Aadhar" name="aadharImage" value={form.aadharImage} onChange={handleChange} />
+          {/* ✅ Pass existingUrl so existing aadhar image is shown when editing */}
+          <DocImageUpload
+            label="Aadhar"
+            name="aadharImage"
+            value={form.aadharImage}
+            existingUrl={buildUrl(form.aadharImage)}
+            onChange={handleChange}
+          />
           {errors.aadharImage && <DocValidationHint valid={false} message={errors.aadharImage} />}
         </DocField>
 
@@ -87,17 +102,22 @@ const Step4Documents = ({ form, handleChange, errors = {} }) => {
             />
             <EyeToggle show={showPAN} onToggle={() => setShowPAN(v => !v)} />
           </div>
-          {/* Live hint while typing — hidden when submit error is present */}
           {cleanPAN && !errors.pan && (
             <DocValidationHint
               valid={validatePAN(cleanPAN)}
               message={validatePAN(cleanPAN) ? 'Valid PAN number' : 'Format: ABCDE1234F'}
             />
           )}
-          {/* Inline error from submit attempt */}
           {errors.pan && <DocValidationHint valid={false} message={errors.pan} />}
 
-          <DocImageUpload label="PAN" name="panImage" value={form.panImage} onChange={handleChange} />
+          {/* ✅ Pass existingUrl so existing PAN image is shown when editing */}
+          <DocImageUpload
+            label="PAN"
+            name="panImage"
+            value={form.panImage}
+            existingUrl={buildUrl(form.panImage)}
+            onChange={handleChange}
+          />
           {errors.panImage && <DocValidationHint valid={false} message={errors.panImage} />}
         </DocField>
       </div>
@@ -142,14 +162,12 @@ const Step4Documents = ({ form, handleChange, errors = {} }) => {
                   : ''
             }`}
           />
-          {/* Live validation hint — shown while typing, hidden on submit error */}
           {cleanIFSC && !errors.ifscCode && (
             <DocValidationHint
               valid={validateIFSC(cleanIFSC)}
               message={validateIFSC(cleanIFSC) ? 'Valid IFSC code' : 'Invalid IFSC — e.g. SBIN0001234'}
             />
           )}
-          {/* Inline error from submit attempt */}
           {errors.ifscCode && <DocValidationHint valid={false} message={errors.ifscCode} />}
         </DocField>
       </div>

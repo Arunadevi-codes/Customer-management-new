@@ -1,113 +1,122 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'react-toastify';
+import { UserCheck, Loader2, ChevronDown } from 'lucide-react';
 import API from "../../../services/api";
+import { useAuth } from "../../../contexts/authContext";
 
-import CustomerFormHeader from './customerFormHeader';
-import CustomerImageUpload from './customerImageUpload';
-import CustomerBasicFields from './customerBasicFields';
+import CustomerFormHeader   from './customerFormHeader';
+import CustomerImageUpload  from './customerImageUpload';
+import CustomerBasicFields  from './customerBasicFields';
 import CustomerAddressFields from './customerAddressField';
-import CustomerFormActions from './customerFormAction';
+import CustomerFormActions  from './customerFormAction';
+import FormField            from '../../../components/ui/formField';
 
 const CustomerForm = ({ customer, onSave, onClose }) => {
-  const isEdit = !!customer;
+  const isEdit        = !!customer;
+  const { user }      = useAuth();
+  const isAdmin       = user?.role === "superadmin";
 
   const [formData, setFormData] = useState({
-    name: customer?.name || '',
-    email: customer?.email || '',
-    phone: customer?.phone || '',
-    street: customer?.street || '',
-    state: customer?.state || '',
-    city: customer?.city || '',
-    pincode: customer?.pincode || '',
-    image: null,
-    removeImage: false
+    name:        customer?.name       || '',
+    email:       customer?.email      || '',
+    phone:       customer?.phone      || '',
+    street:      customer?.street     || '',
+    state:       customer?.state      || '',
+    city:        customer?.city       || '',
+    pincode:     customer?.pincode    || '',
+    image:       null,
+    removeImage: false,
+    assignedTo:  customer?.assignedTo?._id || customer?.assignedTo || '',
   });
 
   const [preview, setPreview] = useState(
-    customer?.image
-      ? `http://localhost:5000/uploads/${customer.image}`
-      : null
+    customer?.image ? `http://localhost:5000/uploads/${customer.image}` : null
   );
 
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
+  const [states,    setStates]    = useState([]);
+  const [cities,    setCities]    = useState([]);
+  const [staffList, setStaffList] = useState([]);
 
   const [loading, setLoading] = useState({
-    states: false,
-    cities: false,
-    submitting: false
+    states: false, cities: false, submitting: false, staff: false,
   });
 
+  // Lock body scroll
   useEffect(() => {
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow     = "hidden";
     document.body.style.paddingRight = `${scrollbarWidth}px`;
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow     = "";
       document.body.style.paddingRight = "";
     };
   }, []);
 
+  // Revoke blob URL on unmount
   useEffect(() => {
     return () => {
-      if (preview && preview.startsWith("blob:")) {
-        URL.revokeObjectURL(preview);
-      }
+      if (preview && preview.startsWith("blob:")) URL.revokeObjectURL(preview);
     };
   }, [preview]);
 
+  // Load states + staff on mount
   useEffect(() => {
     loadStates();
-  }, []);
+    if (isAdmin) loadStaff();
+  }, [isAdmin]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Load cities when state changes
   useEffect(() => {
-    if (formData.state) {
-      loadCities(formData.state);
-    }
+    if (formData.state) loadCities(formData.state);
   }, [formData.state]);
 
   const loadStates = async () => {
     setLoading(prev => ({ ...prev, states: true }));
     try {
-      const res = await API.get("/states");
+      const res  = await API.get("/states");
       const data = res.data;
       if (data.success) setStates(data.states);
       else if (Array.isArray(data)) setStates(data);
-    } catch {
-      toast.error("Failed to load states");
-    } finally {
-      setLoading(prev => ({ ...prev, states: false }));
-    }
+    } catch { toast.error("Failed to load states"); }
+    finally { setLoading(prev => ({ ...prev, states: false })); }
   };
 
   const loadCities = async (stateId) => {
     if (!stateId) return setCities([]);
     setLoading(prev => ({ ...prev, cities: true }));
     try {
-      const res = await API.get(`/cities?stateId=${stateId}`);
+      const res  = await API.get(`/cities?stateId=${stateId}`);
       const data = res.data;
       if (data.success) setCities(data.cities);
       else if (Array.isArray(data)) setCities(data);
       else setCities([]);
-    } catch {
-      toast.error("Failed to load cities");
-      setCities([]);
-    } finally {
-      setLoading(prev => ({ ...prev, cities: false }));
-    }
+    } catch { toast.error("Failed to load cities"); setCities([]); }
+    finally { setLoading(prev => ({ ...prev, cities: false })); }
   };
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const loadStaff = async () => {
+    setLoading(prev => ({ ...prev, staff: true }));
+    try {
+      const res  = await API.get("/staff?status=active&limit=200");
+      const data = res.data;
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data.staffs)    ? data.staffs
+        : Array.isArray(data.staff)     ? data.staff
+        : Array.isArray(data.staffList) ? data.staffList
+        : Array.isArray(data.data)      ? data.data
+        : [];
+      setStaffList(list);
+    } catch { toast.error("Failed to load staff list"); }
+    finally { setLoading(prev => ({ ...prev, staff: false })); }
   };
+
+  const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
+    if (file && file.size > 5 * 1024 * 1024) return toast.error("Image size should be less than 5MB");
     setFormData({ ...formData, image: file });
     if (file) setPreview(URL.createObjectURL(file));
   };
@@ -119,7 +128,7 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
     else setCities([]);
   };
 
-  const validatePhone = (phone) => /^[0-9]{10}$/.test(phone);
+  const validatePhone   = (phone)   => /^[0-9]{10}$/.test(phone);
   const validatePincode = (pincode) => !pincode || /^[0-9]{6}$/.test(pincode);
 
   const handleSubmit = async (e) => {
@@ -127,29 +136,26 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
 
     if (!formData.name || !formData.email || !formData.phone)
       return toast.error("Please fill all required fields");
-
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       return toast.error("Invalid email format");
-
     if (!validatePhone(formData.phone))
       return toast.error("Enter valid 10-digit mobile number");
-
     if (!formData.state) return toast.error("Please select a state");
-    if (!formData.city) return toast.error("Please select a city");
-
+    if (!formData.city)  return toast.error("Please select a city");
     if (formData.pincode && !validatePincode(formData.pincode))
       return toast.error("Enter valid 6-digit pincode");
 
     setLoading(prev => ({ ...prev, submitting: true }));
-
     try {
       const data = new FormData();
       Object.keys(formData).forEach((key) => {
-        if (formData[key]) data.append(key, formData[key]);
+        if (formData[key] !== null && formData[key] !== undefined)
+          data.append(key, formData[key]);
       });
+      data.set("assignedTo", formData.assignedTo || "");
 
       if (isEdit) await onSave(data, customer._id);
-      else await onSave(data);
+      else        await onSave(data);
 
       toast.success(isEdit ? "Customer updated successfully!" : "Customer added successfully!");
       onClose();
@@ -169,7 +175,12 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 [&::-webkit-scrollbar]:hidden">
           <div className="p-5 space-y-5">
 
-            <CustomerImageUpload preview={preview} handleFileChange={handleFileChange} setPreview={setPreview} setFormData={setFormData} />
+            <CustomerImageUpload
+              preview={preview}
+              handleFileChange={handleFileChange}
+              setPreview={setPreview}
+              setFormData={setFormData}
+            />
 
             <CustomerBasicFields formData={formData} handleInputChange={handleInputChange} />
 
@@ -182,13 +193,48 @@ const CustomerForm = ({ customer, onSave, onClose }) => {
               handleStateChange={handleStateChange}
             />
 
+            {/* Staff assignment dropdown — admin only */}
+            {isAdmin && (
+              <FormField label="Assign To Staff" icon={UserCheck}>
+                <div className="relative">
+                  <select
+                    name="assignedTo"
+                    value={formData.assignedTo}
+                    onChange={handleInputChange}
+                    disabled={loading.staff}
+                    className="
+                      w-full appearance-none px-4 py-2.5 pr-9 rounded-xl text-sm
+                      bg-white dark:bg-gray-800
+                      border border-gray-200 dark:border-gray-700
+                      text-gray-800 dark:text-gray-100
+                      focus:border-indigo-400 focus:ring-2
+                      focus:ring-indigo-100 dark:focus:ring-indigo-900/50
+                      outline-none transition-all cursor-pointer
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      dark:[color-scheme:dark]
+                    "
+                  >
+                    <option value="">
+                      {loading.staff ? "Loading staff..." : "— Unassigned —"}
+                    </option>
+                    {staffList.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.fullName} ({s.employeeId})
+                      </option>
+                    ))}
+                  </select>
+
+                  {loading.staff
+                    ? <Loader2 size={14} className="animate-spin text-gray-400 dark:text-gray-500 absolute right-3 top-3.5 pointer-events-none" />
+                    : <ChevronDown size={15} className="text-indigo-500 dark:text-indigo-400 absolute right-3 top-3.5 pointer-events-none" />
+                  }
+                </div>
+              </FormField>
+            )}
+
           </div>
 
-          <CustomerFormActions
-            isEdit={isEdit}
-            loading={loading}
-            onClose={onClose}
-          />
+          <CustomerFormActions isEdit={isEdit} loading={loading} onClose={onClose} />
         </form>
       </div>
     </div>,

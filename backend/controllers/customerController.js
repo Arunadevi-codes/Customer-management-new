@@ -1,7 +1,9 @@
 const fs   = require("fs");
 const path = require("path");
+const mongoose = require("mongoose");
 
 const Customer = require("../models/Customer");
+const Staff    = require("../models/Staff");
 
 const {
   buildSearchQuery,
@@ -10,59 +12,52 @@ const {
   getSortOptions,
 } = require("../helpers/queryHelper");
 
-//  CREATE
-
+// ── CREATE ─────────────────────────────────────────────────────
 exports.createCustomer = async (req, res) => {
   try {
-    const { name, email, phone, street, state, city, pincode } = req.body;
+    const { name, email, phone, street, state, city, pincode, assignedTo } = req.body;
 
     const customer = new Customer({
-      name,
-      email,
-      phone,
-      street,
-      state,
-      city,
-      pincode,
-      image: req.file ? req.file.filename : null,
+      name, email, phone, street, state, city, pincode,
+      image:      req.file ? req.file.filename : null,
+      assignedTo: assignedTo || null,
     });
 
     const saved = await customer.save();
+    await saved.populate("assignedTo", "fullName employeeId");
     res.json(saved);
-
   } catch (err) {
     res.status(500).json(err);
   }
 };
 
-// ─────────────────────────────────────────────
-//  GET ALL  (with search / date filter / sort / pagination)
-// ─────────────────────────────────────────────
-
+// ── GET ALL ────────────────────────────────────────────────────
 exports.getCustomers = async (req, res) => {
   try {
-    // ── Pagination ──────────────────────────
     const { limit, skip } = getPagination(req.query);
 
-    // ── Filters ─────────────────────────────
     const searchQuery = buildSearchQuery(req.query.search, ["name", "email", "phone"]);
     const dateQuery   = buildDateQuery(req.query.fromDate, req.query.toDate);
 
-    const query = { ...searchQuery, ...dateQuery };
+    let query = { ...searchQuery, ...dateQuery };
 
-    // ── Sort ────────────────────────────────
-    const { sortField, sortOrder } = getSortOptions(
-      req.query,
-      null,
-      ["name", "email", "phone"]
-    );
+    // ✅ Staff role — only show their assigned customers
+    // Cast req.user.id to ObjectId explicitly to ensure Mongoose matches correctly
+    if (req.user.role !== "superadmin") {
+      try {
+        query.assignedTo = new mongoose.Types.ObjectId(req.user.id);
+      } catch {
+        // If id is somehow malformed, return empty result safely
+        return res.json({ customers: [], total: 0 });
+      }
+    }
 
-    // ✅ Default: newest first when no sort is specified
+    const { sortField, sortOrder } = getSortOptions(req.query, null, ["name", "email", "phone"]);
     const appliedSortField = sortField || "createdAt";
     const appliedSortOrder = sortField ? sortOrder : -1;
 
-    // ── Query ───────────────────────────────
     const customers = await Customer.find(query)
+      .populate("assignedTo", "fullName employeeId")
       .sort({ [appliedSortField]: appliedSortOrder })
       .collation({ locale: "en", strength: 2 })
       .skip(skip)
@@ -71,141 +66,80 @@ exports.getCustomers = async (req, res) => {
     const total = await Customer.countDocuments(query);
 
     res.json({ customers, total });
-
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-//  GET ONE
-
+// ── GET ONE ────────────────────────────────────────────────────
 exports.getCustomerById = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await Customer.findById(req.params.id)
+      .populate("assignedTo", "fullName employeeId");
 
-    if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
-    }
-
+    if (!customer) return res.status(404).json({ message: "Customer not found" });
     res.json(customer);
-
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch customer", error: err.message });
   }
 };
 
-//  UPDATE
+// ── UPDATE ─────────────────────────────────────────────────────
 exports.updateCustomer = async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      phone,
-      street,
-      state,
-      city,
-      pincode,
-      removeImage
-    } = req.body;
+    const { name, email, phone, street, state, city, pincode, removeImage, assignedTo } = req.body;
 
-    // Find existing customer
     const customer = await Customer.findById(req.params.id);
-
-    if (!customer) {
-      return res.status(404).json({
-        message: "Customer not found"
-      });
-    }
+    if (!customer) return res.status(404).json({ message: "Customer not found" });
 
     const updateData = {
-      name,
-      email,
-      phone,
-      street,
-      state,
-      city,
-      pincode
+      name, email, phone, street, state, city, pincode,
+      assignedTo: assignedTo === "" || assignedTo === "null" ? null : assignedTo || customer.assignedTo,
     };
 
-    // REMOVE EXISTING IMAGE
+    // Remove image
     if (removeImage === "true" && customer.image) {
-
-      const imagePath = path.join(
-        __dirname,
-        "..",
-        "uploads",
-        customer.image
-      );
-
-      // Delete image from uploads folder
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-
-      // Remove image from DB
+      const imagePath = path.join(__dirname, "..", "uploads", customer.image);
+      if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
       updateData.image = null;
     }
 
-    // UPLOAD NEW IMAGE
+    // New image upload
     if (req.file) {
-
-      // Delete old image if exists
       if (customer.image) {
-
-        const oldImagePath = path.join(
-          __dirname,
-          "..",
-          "uploads",
-          customer.image
-        );
-
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
+        const oldPath = path.join(__dirname, "..", "uploads", customer.image);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
-
       updateData.image = req.file.filename;
     }
 
-    // UPDATE CUSTOMER
     const updated = await Customer.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { returnDocument: "after" }
-    );
+      { new: true }
+    ).populate("assignedTo", "fullName employeeId");
 
     res.json(updated);
-
   } catch (err) {
-    res.status(500).json({
-      message: "Failed to update customer",
-      error: err.message
-    });
+    res.status(500).json({ message: "Failed to update customer", error: err.message });
   }
 };
 
-//  DELETE
+// ── DELETE ─────────────────────────────────────────────────────
 exports.deleteCustomer = async (req, res) => {
   try {
     const customer = await Customer.findById(req.params.id);
+    if (!customer) return res.status(404).json({ message: "Customer not found" });
 
-    if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
-    }
-
-    // Remove associated image from disk
     if (customer.image) {
       const imagePath = path.join(__dirname, "..", "uploads", customer.image);
-
       fs.unlink(imagePath, (err) => {
         if (err) console.log("Error deleting image:", err.message);
       });
     }
 
     await Customer.findByIdAndDelete(req.params.id);
-
     res.json({ message: "Deleted successfully" });
-
   } catch (err) {
     res.status(500).json({ message: "Error deleting customer", error: err.message });
   }

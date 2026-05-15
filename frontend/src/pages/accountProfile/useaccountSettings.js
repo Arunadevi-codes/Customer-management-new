@@ -17,19 +17,19 @@ const useAccountSettings = () => {
   const [cities, setCities] = useState([]);
   const [locationLoading, setLocationLoading] = useState({ states: false, cities: false });
 
+  // ✅ Added email to form state
   const [form, setForm] = useState({
-    fullName: "", phone: "", emergencyContact: "", gender: "", dateOfBirth: "",
+    fullName: "", email: "", phone: "", emergencyContact: "", gender: "", dateOfBirth: "",
     addressLine: "", city: "", state: "", pincode: "", country: "",
     role: "", employeeId: "", dateOfJoining: "", status: "", loginEmail: "",
     aadhar: "", pan: "", bankAccountNumber: "", ifscCode: "",
   });
 
-  const [previewImg, setPreviewImg]       = useState(null);   // object URL for local preview
-  const [newImageFile, setNewImageFile]   = useState(null);   // File object to upload
-  // ✅ true when user explicitly clicks X to remove the current profile image
-  const [removeImage, setRemoveImage]     = useState(false);
+  const [previewImg, setPreviewImg]     = useState(null);
+  const [newImageFile, setNewImageFile] = useState(null);
+  const [removeImage, setRemoveImage]   = useState(false);
 
-  const [pwdForm, setPwdForm]   = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const [pwdForm, setPwdForm]     = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
   const [pwdSaving, setPwdSaving] = useState(false);
 
   // ── Fetch profile ──────────────────────────────────────────
@@ -67,9 +67,11 @@ const useAccountSettings = () => {
       setLoading(true);
       const data = await getMyProfile();
       setProfile(data);
+      // ✅ Added email to setForm
       setForm({
-        fullName: data.fullName || "", phone: data.phone || "",
-        emergencyContact: data.emergencyContact || "", gender: data.gender || "",
+        fullName: data.fullName || "", email: data.email || "",
+        phone: data.phone || "", emergencyContact: data.emergencyContact || "",
+        gender: data.gender || "",
         dateOfBirth: data.dateOfBirth?.split("T")[0] || "",
         addressLine: data.addressLine || "", city: data.city || "",
         state: data.state || "", pincode: data.pincode || "", country: data.country || "",
@@ -83,23 +85,21 @@ const useAccountSettings = () => {
     finally { setLoading(false); }
   };
 
-  const handleField        = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  const handleStateChange  = (e) => setForm((prev) => ({ ...prev, state: e.target.value, city: "" }));
+  const handleField       = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleStateChange = (e) => setForm((prev) => ({ ...prev, state: e.target.value, city: "" }));
 
   const handleImagePick = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setNewImageFile(file);
     setPreviewImg(URL.createObjectURL(file));
-    setRemoveImage(false); // picking a new image cancels any pending removal
+    setRemoveImage(false);
   };
 
-  // ✅ X button handler — clears preview/file and flags removal
   const handleRemoveImage = () => {
     setPreviewImg(null);
     setNewImageFile(null);
     setRemoveImage(true);
-    // Reset the file input so the same file can be re-selected if needed
     if (fileRef.current) fileRef.current.value = "";
   };
 
@@ -120,11 +120,13 @@ const useAccountSettings = () => {
       if (newImageFile) {
         fd.append("profileImage", newImageFile);
       } else if (removeImage) {
-        // ✅ Tell the backend to delete and nullify the current image
         fd.append("removeProfileImage", "true");
       }
 
       const res = await updateMyProfile(fd);
+
+      // ✅ Fixed: read token from sessionStorage (not localStorage)
+      const currentToken = sessionStorage.getItem("token");
 
       login(
         {
@@ -134,7 +136,7 @@ const useAccountSettings = () => {
             ? res.staff.profileImage.replace(/\\/g, "/")
             : null,
         },
-        localStorage.getItem("token")
+        currentToken
       );
 
       setProfile(res.staff);
@@ -164,7 +166,6 @@ const useAccountSettings = () => {
   const getInitials = (name = "") =>
     name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
 
-  // ✅ If removeImage is flagged (and no new file chosen), show no avatar
   const avatarSrc =
     previewImg ||
     (removeImage

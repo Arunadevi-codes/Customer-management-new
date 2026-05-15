@@ -5,6 +5,7 @@ import TableSearchBar from '../../components/ui/tableSearchBar';
 import LoadingSpinner from '../../components/ui/loadingSpinner';
 import TablePagination from '../../components/ui/tablePagination';
 
+import { useAuth } from '../../contexts/authContext';
 import { useCustomers } from './useCustomers';
 import ViewCustomer from './viewCustomer';
 import ViewCustomers from './customerPOPup';
@@ -13,6 +14,9 @@ import DeleteCustomer from './deleteCustomer';
 import statesData from '../../data/statesData';
 
 const Customers = () => {
+  const { user }  = useAuth();
+  const isAdmin   = user?.role === "superadmin";
+
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -62,14 +66,14 @@ const Customers = () => {
   return (
     <div className="w-full min-h-screen p-3 md:p-4 space-y-4">
 
-      {/* HEADER */}
+      {/* HEADER — Add button hidden for staff */}
       <PageHeader
         title="Customers"
-        subtitle="Manage your customer database"
-        addLabel="Add Customer"
-        addLabelMob="Add"
+        subtitle={isAdmin ? "Manage your customer database" : "Your assigned customers"}
+        addLabel={isAdmin ? "Add Customer" : undefined}
+        addLabelMob={isAdmin ? "Add" : undefined}
         totalCount={total}
-        onAddClick={handleAddClick}
+        onAddClick={isAdmin ? handleAddClick : undefined}
       />
 
       {/* SEARCH */}
@@ -90,15 +94,15 @@ const Customers = () => {
         <LoadingSpinner label="Loading customers..." />
       ) : (
         <>
-          {/* This div is the true boundary — it never exceeds the page width */}
           <div className="w-full max-w-full min-w-0">
             <ViewCustomer
               customers={customers}
               states={states}
               cities={cities}
               pincode={pincode}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteClick}
+              // Staff can view but not edit or delete
+              onEdit={isAdmin ? handleEditClick : undefined}
+              onDelete={isAdmin ? handleDeleteClick : undefined}
               total={total}
               onView={handleView}
               onSort={handleSort}
@@ -123,8 +127,8 @@ const Customers = () => {
         </>
       )}
 
-      {/* ADD / EDIT */}
-      {isModalOpen && (
+      {/* ADD / EDIT — admin only */}
+      {isAdmin && isModalOpen && (
         <CustomerForm
           customer={editingCustomer}
           onSave={handleSaveCustomer}
@@ -132,15 +136,15 @@ const Customers = () => {
         />
       )}
 
-      {/* DELETE */}
-      {isDeleteModalOpen && (
+      {/* DELETE — admin only */}
+      {isAdmin && isDeleteModalOpen && (
         <DeleteCustomer
           onConfirm={handleConfirmDelete}
           onClose={() => setIsDeleteModalOpen(false)}
         />
       )}
 
-      {/* VIEW */}
+      {/* VIEW — available to all */}
       {showView && (
         <ViewCustomers
           customer={selectedCustomer}

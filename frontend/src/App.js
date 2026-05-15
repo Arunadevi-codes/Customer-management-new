@@ -29,12 +29,13 @@ function App() {
             </Route>
           </Route>
 
-          {/* ── Staff routes — staff only ── */}
-          <Route element={<ProtectedRoute allowedRoles={["staff"]} />}>
+          {/* ── Staff routes — non-superadmin ── */}
+          <Route element={<ProtectedRoute allowedRoles={["staff", "admin", "manager"]} />}>
             <Route element={<MainLayout />}>
               <Route path="/staff-dashboard" element={<Dashboard />} />
-              <Route path="/staff-directory" element={<Staff />} /> 
-              <Route path="/staff-account"   element={<AccountSettings />} />
+              <Route path="/staff-customers" element={<Customers />} /> 
+              <Route path="/staff-directory" element={<Staff />} />
+              <Route path="/staff-account" element={<AccountSettings />} />
             </Route>
           </Route>
 

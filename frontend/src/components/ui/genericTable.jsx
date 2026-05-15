@@ -51,7 +51,6 @@ const GenericTable = ({
         ? "Click to sort descending"
         : "Click to sort ascending";
     }
-
     return "Click to sort ascending";
   };
 
@@ -63,11 +62,9 @@ const GenericTable = ({
             size={60}
             className="mb-4 text-gray-300 dark:text-gray-600"
           />
-
           <p className="text-lg font-semibold text-gray-700 dark:text-white">
             {emptyTitle}
           </p>
-
           {emptySubtitle && (
             <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
               {emptySubtitle}
@@ -80,11 +77,9 @@ const GenericTable = ({
 
   return (
     <div className="w-full min-w-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden">
-      <div
-        className="overflow-x-auto lg:overflow-x-visible"
-        style={{ WebkitOverflowScrolling: "touch" }}
-      >
-        <table className="min-w-[900px] lg:min-w-0 w-full table-auto border-collapse">
+      <div className="w-full">
+        {/* table-fixed + w-full makes columns share available width without overflow */}
+        <table className="w-full border-collapse table-fixed">
           <TableHeaderRow>
             {columns.map((col) =>
               col.sortable ? (

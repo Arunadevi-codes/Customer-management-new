@@ -39,7 +39,7 @@ export const SortableTh = ({
   <th
     onClick={() => onSort(field)}
     title={getSortTooltip ? getSortTooltip(field) : undefined}
-    className="px-3 sm:px-4 py-2 sm:py-3 text-center text-[11px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+    className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-center text-[11px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
   >
     <div className="flex items-center justify-center gap-4">
       <span>{label}</span>
@@ -54,7 +54,7 @@ export const SortableTh = ({
 );
 
 export const StaticTh = ({ label }) => (
-  <th className="px-3 sm:px-4 py-2 sm:py-3 text-center text-[11px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+  <th className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap text-center text-[11px] sm:text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
     {label}
   </th>
 );

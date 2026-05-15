@@ -30,6 +30,25 @@ export const TextInput = ({ disabled, ...props }) => (
   <input disabled={disabled} className={inputStyles(disabled)} {...props} />
 );
 
+// ── Phone Input — numbers only, max 10 digits ─────────────────
+export const PhoneInput = ({ disabled, onChange, ...props }) => {
+  const handleInput = (e) => {
+    // Strip non-numeric characters and limit to 10 digits
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+    if (onChange) onChange(e);
+  };
+  return (
+    <input
+      type="tel"
+      disabled={disabled}
+      onChange={handleInput}
+      maxLength={10}
+      className={inputStyles(disabled)}
+      {...props}
+    />
+  );
+};
+
 export const SelectInput = ({ disabled, children, ...props }) => (
   <select disabled={disabled} className={inputStyles(disabled)} {...props}>
     {children}

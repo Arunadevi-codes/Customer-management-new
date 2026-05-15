@@ -1,18 +1,14 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in on mount
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    
+    // sessionStorage is unique per tab — admin tab and staff tab never share data
+    const token      = sessionStorage.getItem('token');
+    const storedUser = sessionStorage.getItem('user');
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -21,14 +17,16 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData, token) => {
     setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('token', token);
+    // Each tab saves into its own sessionStorage — completely isolated
+    sessionStorage.setItem('user',  JSON.stringify(userData));
+    sessionStorage.setItem('token', token);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    // Only clears THIS tab's session — other tabs unaffected
+    sessionStorage.removeItem('user');
+    sessionStorage.removeItem('token');
   };
 
   return (

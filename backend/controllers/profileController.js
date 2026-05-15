@@ -29,7 +29,7 @@ exports.updateMyProfile = async (req, res) => {
     const allowed = [
       "fullName", "phone", "emergencyContact", "gender", "dateOfBirth",
       "addressLine", "city", "state", "pincode", "country",
-      "dateOfJoining",
+      "dateOfJoining", "email",
       "aadhar", "pan", "bankAccountNumber", "ifscCode",
       "loginEmail",
     ];
